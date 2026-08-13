@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ExternalLink, ShoppingBag, Sparkles, Box, Film, Image, CheckCircle, Database } from 'lucide-react';
+import { ExternalLink, ShoppingBag, Sparkles, Box, Film, Image, CheckCircle, Database, Layers } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './ProjectsShowcase.css';
@@ -144,7 +144,7 @@ export default function ProjectsShowcase({
         },
       });
 
-      // Rotación de 360° del Planeta 3D y Banderas Tecnológicas en el fondo
+      // Rotación 360° de la matriz de arquitectura en el fondo
       if (orbit) {
         gsap.to(orbit, {
           rotate: 360,
@@ -162,7 +162,7 @@ export default function ProjectsShowcase({
     return () => ctx.revert();
   }, [projects]);
 
-  // Renderizar vistas previas personalizadas por proyecto
+  // Vistas previas sin emojis usando SVG icons técnicos
   const renderProjectPreview = (type: string) => {
     switch (type) {
       case 'pos':
@@ -249,7 +249,7 @@ export default function ProjectsShowcase({
               <div className="remover-original">
                 <span>Original</span>
               </div>
-              <div className="remover-arrow">➔</div>
+              <div className="remover-arrow">-&gt;</div>
               <div className="remover-result">
                 <div className="checkerboard-bg">
                   <span className="png-badge">PNG Alpha</span>
@@ -272,109 +272,91 @@ export default function ProjectsShowcase({
       )}
 
       <section ref={sectionRef} className="projects-showcase-section">
-        {/* GLOBO PLANETARIO 3D VIBRANTE Y BANDERAS TECNOLÓGICAS (DETRÁS DE LAS TARJETAS) */}
+        {/* NÚCLEO Y MATRIZ DE ARQUITECTURA DE SOFTWARE (DETRÁS DE LAS TARJETAS) */}
         <div className="giant-orbit-wrapper" aria-hidden="true">
-          <div ref={orbitRef} className="planet-container">
-            {/* Esfera 3D del Planeta estilo Travel Slider */}
-            <svg className="planet-globe-svg" viewBox="0 0 700 700" fill="none">
+          <div ref={orbitRef} className="system-core-container">
+            {/* SVG con anillos de radar y ejes de datos */}
+            <svg className="system-core-svg" viewBox="0 0 700 700" fill="none">
               <defs>
-                <radialGradient id="ocean-grad" cx="40%" cy="35%" r="65%">
-                  <stop offset="0%" stopColor="#38bdf8" />
-                  <stop offset="45%" stopColor="#0284c7" />
-                  <stop offset="85%" stopColor="#0369a1" />
-                  <stop offset="100%" stopColor="#0f172a" />
+                <radialGradient id="core-glow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
+                  <stop offset="40%" stopColor="#06b6d4" stopOpacity="0.12" />
+                  <stop offset="80%" stopColor="#a855f7" stopOpacity="0.05" />
+                  <stop offset="100%" stopColor="#09090b" stopOpacity="0" />
                 </radialGradient>
-                <radialGradient id="atmosphere-glow" cx="50%" cy="50%" r="50%">
-                  <stop offset="70%" stopColor="rgba(56, 189, 248, 0)" />
-                  <stop offset="92%" stopColor="rgba(56, 189, 248, 0.4)" />
-                  <stop offset="100%" stopColor="rgba(16, 185, 129, 0.65)" />
-                </radialGradient>
-                <filter id="glow-filter" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="14" result="blur" />
-                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                </filter>
+                <linearGradient id="ring-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stopColor="#10b981" />
+                  <stop offset="50%" stopColor="#06b6d4" />
+                  <stop offset="100%" stopColor="#a855f7" />
+                </linearGradient>
               </defs>
 
-              {/* Anillos de atmósfera exterior */}
-              <circle cx="350" cy="350" r="325" fill="none" stroke="rgba(56, 189, 248, 0.35)" strokeWidth="2" strokeDasharray="6 8" />
-              <circle cx="350" cy="350" r="300" fill="none" stroke="rgba(16, 185, 129, 0.45)" strokeWidth="2" filter="url(#glow-filter)" />
+              {/* Resplandor del núcleo */}
+              <circle cx="350" cy="350" r="320" fill="url(#core-glow)" />
 
-              {/* Esfera Base del Planeta */}
-              <circle cx="350" cy="350" r="280" fill="url(#ocean-grad)" />
+              {/* Anillos concéntricos de arquitectura */}
+              <circle cx="350" cy="350" r="310" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="1" strokeDasharray="4 8" />
+              <circle cx="350" cy="350" r="290" stroke="url(#ring-grad-1)" strokeWidth="2" strokeDasharray="160 20 40 20" opacity="0.85" />
+              <circle cx="350" cy="350" r="240" stroke="#06b6d4" strokeWidth="1.5" strokeDasharray="80 15 200 15" opacity="0.6" />
+              <circle cx="350" cy="350" r="190" stroke="#a855f7" strokeWidth="1.5" strokeDasharray="120 30" opacity="0.5" />
+              <circle cx="350" cy="350" r="140" stroke="rgba(16, 185, 129, 0.4)" strokeWidth="1" strokeDasharray="6 6" />
+              <circle cx="350" cy="350" r="90" stroke="rgba(255, 255, 255, 0.12)" strokeWidth="1" />
 
-              {/* Capa de Atmósfera Brillante */}
-              <circle cx="350" cy="350" r="280" fill="url(#atmosphere-glow)" />
+              {/* Ejes transversales de sistema */}
+              <line x1="350" y1="20" x2="350" y2="680" stroke="rgba(255, 255, 255, 0.06)" strokeWidth="1" strokeDasharray="4 4" />
+              <line x1="20" y1="350" x2="680" y2="350" stroke="rgba(255, 255, 255, 0.06)" strokeWidth="1" strokeDasharray="4 4" />
+              <line x1="117" y1="117" x2="583" y2="583" stroke="rgba(255, 255, 255, 0.04)" strokeWidth="1" strokeDasharray="4 4" />
+              <line x1="583" y1="117" x2="117" y2="583" stroke="rgba(255, 255, 255, 0.04)" strokeWidth="1" strokeDasharray="4 4" />
 
-              {/* Continentes Esmeralda Estilizados */}
-              <g fill="#10b981" opacity="0.92">
-                <path d="M 210 180 Q 230 150 270 170 Q 300 190 280 250 Q 260 270 290 320 Q 320 370 280 440 Q 250 480 230 420 Q 220 360 240 310 Q 210 270 190 220 Z" />
-                <path d="M 370 160 Q 420 140 450 170 Q 430 220 400 240 Q 420 300 460 350 Q 430 430 380 450 Q 360 380 370 320 Q 350 250 370 160 Z" />
-                <path d="M 480 180 Q 560 170 580 230 Q 540 280 500 260 Q 520 330 560 370 Q 540 430 490 400 Q 470 340 480 180 Z" />
-              </g>
-
-              {/* Líneas de Latitud y Longitud */}
-              <g stroke="rgba(255, 255, 255, 0.18)" strokeWidth="1.5" fill="none">
-                <ellipse cx="350" cy="350" rx="280" ry="110" />
-                <ellipse cx="350" cy="350" rx="280" ry="200" />
-                <ellipse cx="350" cy="350" rx="130" ry="280" />
-                <ellipse cx="350" cy="350" rx="220" ry="280" />
-              </g>
+              {/* Indicador del núcleo central */}
+              <circle cx="350" cy="350" r="16" fill="#09090b" stroke="#10b981" strokeWidth="2" />
+              <circle cx="350" cy="350" r="6" fill="#34d399" />
             </svg>
 
-            {/* BANDERAS TECNOLÓGICAS 3D ROTANDO EN LA CURVATURA SUPERIOR DEL PLANETA */}
-            <div className="planet-badges-ring">
+            {/* NODOS DE SISTEMA TÉCNICOS SIN EMOJIS EN EL PERÍMETRO */}
+            <div className="system-badges-ring">
               {/* Nodo 1: POS Farma - 0 deg (Arriba) */}
-              <div className="tech-flag-badge badge-pos" style={{ transform: 'rotate(0deg) translateY(-295px) rotate(0deg)' }}>
-                <div className="flag-content emerald">
-                  <span className="flag-icon">💊</span>
-                  <div className="flag-text">
-                    <strong>POS Farma</strong>
-                    <small>Desktop • SQLite</small>
-                  </div>
+              <div className="tech-node-badge node-pos" style={{ transform: 'rotate(0deg) translateY(-290px) rotate(0deg)' }}>
+                <span className="node-dot emerald" />
+                <div className="node-info">
+                  <span className="node-code">SYS-01</span>
+                  <span className="node-title">POS Farma</span>
                 </div>
               </div>
 
               {/* Nodo 2: CotiPro SaaS - 72 deg */}
-              <div className="tech-flag-badge badge-cotipro" style={{ transform: 'rotate(72deg) translateY(-295px) rotate(-72deg)' }}>
-                <div className="flag-content cyan">
-                  <span className="flag-icon">⚡</span>
-                  <div className="flag-text">
-                    <strong>CotiPro SaaS</strong>
-                    <small>React • Supabase</small>
-                  </div>
+              <div className="tech-node-badge node-cotipro" style={{ transform: 'rotate(72deg) translateY(-290px) rotate(-72deg)' }}>
+                <span className="node-dot cyan" />
+                <div className="node-info">
+                  <span className="node-code">SYS-02</span>
+                  <span className="node-title">CotiPro SaaS</span>
                 </div>
               </div>
 
               {/* Nodo 3: Vortex 3D - 144 deg */}
-              <div className="tech-flag-badge badge-vortex" style={{ transform: 'rotate(144deg) translateY(-295px) rotate(-144deg)' }}>
-                <div className="flag-content purple">
-                  <span className="flag-icon">🎮</span>
-                  <div className="flag-text">
-                    <strong>Vortex 3D</strong>
-                    <small>GSAP • Canvas</small>
-                  </div>
+              <div className="tech-node-badge node-vortex" style={{ transform: 'rotate(144deg) translateY(-290px) rotate(-144deg)' }}>
+                <span className="node-dot purple" />
+                <div className="node-info">
+                  <span className="node-code">SYS-03</span>
+                  <span className="node-title">Vortex 3D</span>
                 </div>
               </div>
 
               {/* Nodo 4: AI Trailer - 216 deg */}
-              <div className="tech-flag-badge badge-trailer" style={{ transform: 'rotate(216deg) translateY(-295px) rotate(-216deg)' }}>
-                <div className="flag-content amber">
-                  <span className="flag-icon">🎬</span>
-                  <div className="flag-text">
-                    <strong>AI Trailer</strong>
-                    <small>Vite • React</small>
-                  </div>
+              <div className="tech-node-badge node-trailer" style={{ transform: 'rotate(216deg) translateY(-290px) rotate(-216deg)' }}>
+                <span className="node-dot amber" />
+                <div className="node-info">
+                  <span className="node-code">SYS-04</span>
+                  <span className="node-title">AI Trailer</span>
                 </div>
               </div>
 
               {/* Nodo 5: Image Remover - 288 deg */}
-              <div className="tech-flag-badge badge-remover" style={{ transform: 'rotate(288deg) translateY(-295px) rotate(-288deg)' }}>
-                <div className="flag-content pink">
-                  <span className="flag-icon">✂️</span>
-                  <div className="flag-text">
-                    <strong>Bg Remover</strong>
-                    <small>Canvas API</small>
-                  </div>
+              <div className="tech-node-badge node-remover" style={{ transform: 'rotate(288deg) translateY(-290px) rotate(-288deg)' }}>
+                <span className="node-dot pink" />
+                <div className="node-info">
+                  <span className="node-code">SYS-05</span>
+                  <span className="node-title">Bg Remover</span>
                 </div>
               </div>
             </div>
@@ -387,7 +369,7 @@ export default function ProjectsShowcase({
           <p className="projects-showcase-description">{description}</p>
         </div>
 
-        {/* Pista horizontal de tarjetas (flotando al frente del gran globo) */}
+        {/* Pista horizontal de tarjetas (flotando al frente del núcleo técnico) */}
         <div className="projects-showcase-track-container">
           <div ref={trackRef} className="projects-showcase-track">
             {projects.map((project) => {
@@ -445,7 +427,7 @@ export default function ProjectsShowcase({
                     </div>
                   </div>
 
-                  {/* Window Mockup Frame con contenido interactivo del proyecto */}
+                  {/* Window Mockup Frame con contenido del proyecto */}
                   <div className="card-mockup-frame">
                     <div className="mockup-header">
                       <div className="mockup-dots">
