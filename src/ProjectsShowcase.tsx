@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ExternalLink, ShoppingBag, Sparkles, Box, Film, Image, CheckCircle, Database, ChevronDown, ArrowRight, X } from 'lucide-react';
+import { ExternalLink, ShoppingBag, Sparkles, Box, Film, Image, CheckCircle, Database, ChevronDown, ArrowRight, ArrowDown, X } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './ProjectsShowcase.css';
@@ -176,6 +176,22 @@ export default function ProjectsShowcase({
 
   const handleCardClick = (id: string) => {
     setExpandedCardId((prev) => (prev === id ? null : id));
+  };
+
+  // Función para saltar la sección de proyectos e ir al contenido inferior
+  const handleSkipSection = () => {
+    const section = sectionRef.current;
+    const track = trackRef.current;
+    if (!section || !track) return;
+
+    const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+    const trackWidth = track.scrollWidth;
+    const targetY = sectionTop + trackWidth + 120;
+
+    window.scrollTo({
+      top: targetY,
+      behavior: 'smooth',
+    });
   };
 
   const renderProjectPreview = (type: string) => {
@@ -536,7 +552,7 @@ export default function ProjectsShowcase({
           </div>
         </div>
 
-        {/* Indicador inferior con progreso */}
+        {/* Indicador inferior con progreso y botón para saltar la sección */}
         <div className="projects-showcase-footer">
           <div className="progress-bar-container">
             <div
@@ -545,7 +561,10 @@ export default function ProjectsShowcase({
             />
           </div>
           <div className="footer-label-row">
-            <span>PORTFOLIO SHOWCASE • NAVEGACIÓN ESTÁNDAR</span>
+            <span>PORTFOLIO SHOWCASE • NAVEGACIÓN HORIZONTAL</span>
+            <button className="skip-showcase-btn" onClick={handleSkipSection}>
+              Saltar proyectos <ArrowDown size={14} />
+            </button>
             <span className="step-counter">
               0{activeStep} / 0{projects.length}
             </span>

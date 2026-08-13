@@ -1,5 +1,5 @@
 /* ==========================================================================
-   PROJECTS SHOWCASE - SMOOTH SNAP & DRAG-TO-SLIDE HORIZONTAL SLIDER
+   PROJECTS SHOWCASE - ORIGINAL GSAP SCROLLTRIGGER HORIZONTAL SLIDER
    ========================================================================== */
 
 .projects-showcase-wrapper {
@@ -238,7 +238,7 @@
   }
 }
 
-/* Track Container con Cursor Grab / Grabbing */
+/* Track Container */
 .projects-showcase-track-container {
   position: relative;
   width: 100%;
@@ -247,12 +247,6 @@
   margin-top: auto;
   margin-bottom: auto;
   z-index: 10;
-  cursor: grab;
-  user-select: none;
-}
-
-.projects-showcase-track-container.is-dragging {
-  cursor: grabbing;
 }
 
 .projects-showcase-track {
@@ -916,7 +910,7 @@
 /* Footer Indicator */
 .projects-showcase-footer {
   width: 100%;
-  max-width: 48rem;
+  max-width: 52rem;
   margin-left: auto;
   margin-right: auto;
   padding-left: 2rem;
@@ -949,6 +943,31 @@
   font-family: monospace;
   color: #71717a;
   letter-spacing: 0.05em;
+}
+
+/* BOTÓN DE SALTAR SECCIÓN */
+.skip-showcase-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #a1a1aa;
+  background-color: rgba(39, 39, 42, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0.3rem 0.75rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  pointer-events: auto;
+}
+
+.skip-showcase-btn:hover {
+  color: #ffffff;
+  background-color: rgba(16, 185, 129, 0.2);
+  border-color: rgba(16, 185, 129, 0.5);
+  transform: translateY(1px);
 }
 
 .step-counter {
