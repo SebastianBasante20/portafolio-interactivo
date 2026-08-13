@@ -115,8 +115,6 @@ export default function ProjectsShowcase({
   const sectionRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const orbitRef = useRef<HTMLDivElement>(null);
-  const scrollTriggerRef = useRef<ScrollTrigger | null>(null);
-
   const [activeStep, setActiveStep] = useState(1);
   const [progressPercent, setProgressPercent] = useState(0);
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
@@ -138,63 +136,43 @@ export default function ProjectsShowcase({
 
       const nodeAngles = [0, 72, 144, 216, 288];
 
-      const st = ScrollTrigger.create({
-        trigger: section,
-        start: 'top top',
-        end: () => `+=${track.scrollWidth}`,
-        pin: true,
-        scrub: 1,
-        invalidateOnRefresh: true,
-        animation: gsap.to(track, {
-          x: getScrollAmount,
-          ease: 'none',
-        }),
-        onUpdate: (self) => {
-          const p = Math.max(0, Math.min(1, self.progress));
-          setProgressPercent(Math.round(p * 100));
-          const step = Math.min(
-            projects.length,
-            Math.floor(p * projects.length) + 1
-          );
-          setActiveStep(step);
+      gsap.to(track, {
+        x: getScrollAmount,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: section,
+          start: 'top top',
+          end: () => `+=${track.scrollWidth}`,
+          pin: true,
+          scrub: 1,
+          invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            const p = Math.max(0, Math.min(1, self.progress));
+            setProgressPercent(Math.round(p * 100));
+            const step = Math.min(
+              projects.length,
+              Math.floor(p * projects.length) + 1
+            );
+            setActiveStep(step);
 
-          // Sincronización de órbita: el nodo de la tarjeta activa queda arriba (0 deg)
-          const orbitRotation = -p * 288;
-          if (orbit) {
-            gsap.set(orbit, { rotate: orbitRotation });
-          }
+            const orbitRotation = -p * 288;
+            if (orbit) {
+              gsap.set(orbit, { rotate: orbitRotation });
+            }
 
-          // Contrarrotar las tarjetas de nodos para mantener texto e iconos 100% verticales
-          const cards = section.querySelectorAll('.landmark-card');
-          cards.forEach((card, idx) => {
-            const baseAngle = nodeAngles[idx] || 0;
-            const currentTotalAngle = orbitRotation + baseAngle;
-            gsap.set(card, { rotate: -currentTotalAngle });
-          });
+            const cards = section.querySelectorAll('.landmark-card');
+            cards.forEach((card, idx) => {
+              const baseAngle = nodeAngles[idx] || 0;
+              const currentTotalAngle = orbitRotation + baseAngle;
+              gsap.set(card, { rotate: -currentTotalAngle });
+            });
+          },
         },
       });
-
-      scrollTriggerRef.current = st;
-      // Inicialmente deshabilitado para que fuera de las tarjetas el scroll sea vertical
-      st.disable(false);
     }, sectionRef);
 
     return () => ctx.revert();
   }, [projects]);
-
-  // Al colocar el cursor sobre la pista de tarjetas se activa la navegación horizontal por proyectos
-  const handleCardsMouseEnter = () => {
-    if (scrollTriggerRef.current) {
-      scrollTriggerRef.current.enable();
-    }
-  };
-
-  // Al salir de las tarjetas se restaura el scroll vertical normal
-  const handleCardsMouseLeave = () => {
-    if (scrollTriggerRef.current) {
-      scrollTriggerRef.current.disable(false);
-    }
-  };
 
   const handleCardClick = (id: string) => {
     setExpandedCardId((prev) => (prev === id ? null : id));
@@ -432,12 +410,8 @@ export default function ProjectsShowcase({
           <p className="projects-showcase-description">{description}</p>
         </div>
 
-        {/* Pista horizontal de tarjetas: al colocar el cursor dentro se activa el scroll horizontal por proyectos */}
-        <div
-          className="projects-showcase-track-container"
-          onMouseEnter={handleCardsMouseEnter}
-          onMouseLeave={handleCardsMouseLeave}
-        >
+        {/* Pista horizontal de tarjetas */}
+        <div className="projects-showcase-track-container">
           <div ref={trackRef} className="projects-showcase-track">
             {projects.map((project) => {
               const isExpanded = expandedCardId === project.id;
@@ -571,7 +545,7 @@ export default function ProjectsShowcase({
             />
           </div>
           <div className="footer-label-row">
-            <span>PORTFOLIO SHOWCASE • TARJETAS = DESPLAZAMIENTO HORIZONTAL</span>
+            <span>PORTFOLIO SHOWCASE • NAVEGACIÓN ESTÁNDAR</span>
             <span className="step-counter">
               0{activeStep} / 0{projects.length}
             </span>
