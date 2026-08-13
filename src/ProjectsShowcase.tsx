@@ -121,7 +121,9 @@ export default function ProjectsShowcase({
         return -(trackWidth - window.innerWidth + 60);
       };
 
-      // Desplazamiento horizontal pinned
+      const nodeAngles = [0, 72, 144, 216, 288];
+
+      // Desplazamiento horizontal pinned con sincronización exacta de órbita y orientación vertical de tarjetas
       gsap.to(track, {
         x: getScrollAmount,
         ease: 'none',
@@ -140,23 +142,23 @@ export default function ProjectsShowcase({
               Math.floor(p * projects.length) + 1
             );
             setActiveStep(step);
+
+            // Rotación de órbita sincronizada: la tarjeta activa siempre queda en la parte superior (0 deg)
+            const orbitRotation = -p * 288;
+            if (orbit) {
+              gsap.set(orbit, { rotate: orbitRotation });
+            }
+
+            // Contrarrotar las tarjetas de los nodos para mantener el texto y los iconos SIEMPRE 100% verticales y legibles
+            const cards = section.querySelectorAll('.landmark-card');
+            cards.forEach((card, idx) => {
+              const baseAngle = nodeAngles[idx] || 0;
+              const currentTotalAngle = orbitRotation + baseAngle;
+              gsap.set(card, { rotate: -currentTotalAngle });
+            });
           },
         },
       });
-
-      // Rotación 360° del Anillo Orbital y Nodos Ilustrados en el fondo
-      if (orbit) {
-        gsap.to(orbit, {
-          rotate: 360,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: section,
-            start: 'top top',
-            end: () => `+=${track.scrollWidth}`,
-            scrub: 1,
-          },
-        });
-      }
     }, sectionRef);
 
     return () => ctx.revert();
@@ -315,7 +317,7 @@ export default function ProjectsShowcase({
             {/* NODOS CON PUNTOS LUMINOSOS Y TARJETAS ILUSTRADAS VECTORIALES SVG */}
             <div className="system-badges-ring">
               {/* Nodo 1: POS Farma - 0 deg (Arriba) */}
-              <div className="tech-landmark-node node-pos" style={{ transform: 'rotate(0deg) translateY(-290px) rotate(0deg)' }}>
+              <div className="tech-landmark-node node-pos" style={{ transform: 'rotate(0deg) translateY(-290px)' }}>
                 <span className="glowing-orb-dot emerald" />
                 <div className="node-stalk emerald" />
                 <div className="landmark-card emerald">
@@ -332,7 +334,7 @@ export default function ProjectsShowcase({
               </div>
 
               {/* Nodo 2: CotiPro SaaS - 72 deg */}
-              <div className="tech-landmark-node node-cotipro" style={{ transform: 'rotate(72deg) translateY(-290px) rotate(-72deg)' }}>
+              <div className="tech-landmark-node node-cotipro" style={{ transform: 'rotate(72deg) translateY(-290px)' }}>
                 <span className="glowing-orb-dot cyan" />
                 <div className="node-stalk cyan" />
                 <div className="landmark-card cyan">
@@ -349,7 +351,7 @@ export default function ProjectsShowcase({
               </div>
 
               {/* Nodo 3: Vortex 3D - 144 deg */}
-              <div className="tech-landmark-node node-vortex" style={{ transform: 'rotate(144deg) translateY(-290px) rotate(-144deg)' }}>
+              <div className="tech-landmark-node node-vortex" style={{ transform: 'rotate(144deg) translateY(-290px)' }}>
                 <span className="glowing-orb-dot purple" />
                 <div className="node-stalk purple" />
                 <div className="landmark-card purple">
@@ -365,7 +367,7 @@ export default function ProjectsShowcase({
               </div>
 
               {/* Nodo 4: AI Trailer - 216 deg */}
-              <div className="tech-landmark-node node-trailer" style={{ transform: 'rotate(216deg) translateY(-290px) rotate(-216deg)' }}>
+              <div className="tech-landmark-node node-trailer" style={{ transform: 'rotate(216deg) translateY(-290px)' }}>
                 <span className="glowing-orb-dot amber" />
                 <div className="node-stalk amber" />
                 <div className="landmark-card amber">
@@ -382,7 +384,7 @@ export default function ProjectsShowcase({
               </div>
 
               {/* Nodo 5: Image Remover - 288 deg */}
-              <div className="tech-landmark-node node-remover" style={{ transform: 'rotate(288deg) translateY(-290px) rotate(-288deg)' }}>
+              <div className="tech-landmark-node node-remover" style={{ transform: 'rotate(288deg) translateY(-290px)' }}>
                 <span className="glowing-orb-dot pink" />
                 <div className="node-stalk pink" />
                 <div className="landmark-card pink">
