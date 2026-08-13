@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ExternalLink, ShoppingBag, Sparkles, Box, Film, Image, CheckCircle, Database } from 'lucide-react';
+import { ExternalLink, ShoppingBag, Sparkles, Box, Film, Image, CheckCircle, Database, ChevronDown, ArrowRight, X } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './ProjectsShowcase.css';
@@ -15,6 +15,8 @@ export interface ProjectItem {
   domain?: string;
   icon: any;
   previewType: 'pos' | 'cotipro' | 'vortex' | 'trailer' | 'remover';
+  problem: string;
+  architecture: string;
 }
 
 export const DEFAULT_PROJECTS: ProjectItem[] = [
@@ -30,6 +32,8 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     domain: 'farmaeconomica.pos.local',
     icon: ShoppingBag,
     previewType: 'pos',
+    problem: 'En municipios con baja conectividad, las caídas de internet paralizan la facturación en caja.',
+    architecture: 'Aplicación Desktop Electron con SQLite embebido y Drizzle ORM. Persistencia 100% offline en disco local con sync opcional.',
   },
   {
     id: 'cotipro',
@@ -43,6 +47,8 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     domain: 'cotipro.app',
     icon: Sparkles,
     previewType: 'cotipro',
+    problem: 'Las empresas B2B tardan horas preparando cotizaciones en PDF y pierden seguimiento de ventas.',
+    architecture: 'Arquitectura multi-empresa isolada con Supabase RLS, asistente IA seguro en backend serverless y firma digital con trazabilidad.',
   },
   {
     id: 'vortex-studio',
@@ -56,6 +62,8 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     domain: 'vortex.studio.dev',
     icon: Box,
     previewType: 'vortex',
+    problem: 'Renderizar videos pesados para personajes 3D ralentiza la carga web en teléfonos.',
+    architecture: 'Generación vectorial interactiva con GSAP ScrollTrigger sobre Canvas 2D a 60 FPS estables sin descargar videos.',
   },
   {
     id: 'ai-trailer',
@@ -69,6 +77,8 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     domain: 'aitrailer.studio',
     icon: Film,
     previewType: 'trailer',
+    problem: 'Producir tráilers publicitarios requiere costosos softwares de edición y horas de render.',
+    architecture: 'Pipeline serverless que combina APIs generativas de video/voz con una línea de tiempo modular en React.',
   },
   {
     id: 'bg-remover',
@@ -82,6 +92,8 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     domain: 'bg-remover.local',
     icon: Image,
     previewType: 'remover',
+    problem: 'Depender de servidores externos para quitar fondos incrementa costos y tiempos de latencia.',
+    architecture: 'Algoritmo de segmentación ejecutado directo en cliente con Canvas API y canal Alfa PNG sin enviar imágenes a terceros.',
   },
 ];
 
@@ -105,6 +117,7 @@ export default function ProjectsShowcase({
   const orbitRef = useRef<HTMLDivElement>(null);
   const [activeStep, setActiveStep] = useState(1);
   const [progressPercent, setProgressPercent] = useState(0);
+  const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
@@ -123,7 +136,7 @@ export default function ProjectsShowcase({
 
       const nodeAngles = [0, 72, 144, 216, 288];
 
-      // Desplazamiento horizontal pinned con sincronización exacta de órbita y orientación vertical de tarjetas
+      // Desplazamiento horizontal pinned con rotación de órbita y contrarrotación vertical
       gsap.to(track, {
         x: getScrollAmount,
         ease: 'none',
@@ -143,13 +156,13 @@ export default function ProjectsShowcase({
             );
             setActiveStep(step);
 
-            // Rotación de órbita sincronizada: la tarjeta activa siempre queda en la parte superior (0 deg)
+            // Sincronización de órbita: el nodo de la tarjeta activa queda arriba (0 deg)
             const orbitRotation = -p * 288;
             if (orbit) {
               gsap.set(orbit, { rotate: orbitRotation });
             }
 
-            // Contrarrotar las tarjetas de los nodos para mantener el texto y los iconos SIEMPRE 100% verticales y legibles
+            // Contrarrotar las tarjetas de nodos para mantener texto e iconos 100% verticales
             const cards = section.querySelectorAll('.landmark-card');
             cards.forEach((card, idx) => {
               const baseAngle = nodeAngles[idx] || 0;
@@ -164,7 +177,10 @@ export default function ProjectsShowcase({
     return () => ctx.revert();
   }, [projects]);
 
-  // Vistas previas sin emojis usando SVG icons técnicos
+  const handleCardClick = (id: string) => {
+    setExpandedCardId((prev) => (prev === id ? null : id));
+  };
+
   const renderProjectPreview = (type: string) => {
     switch (type) {
       case 'pos':
@@ -274,10 +290,9 @@ export default function ProjectsShowcase({
       )}
 
       <section ref={sectionRef} className="projects-showcase-section">
-        {/* ESTRUCTURA ORBITAL Y NODOS ILUSTRADOS VECTORIALES SVG (SOBRE LOS PUNTOS BRILLANTES) */}
+        {/* ESTRUCTURA ORBITAL Y NODOS ILUSTRADOS VECTORIALES SVG */}
         <div className="giant-orbit-wrapper" aria-hidden="true">
           <div ref={orbitRef} className="system-core-container">
-            {/* SVG Anillo Orbital Neon con Resplandor */}
             <svg className="system-core-svg" viewBox="0 0 700 700" fill="none">
               <defs>
                 <radialGradient id="core-glow" cx="50%" cy="50%" r="50%">
@@ -298,25 +313,18 @@ export default function ProjectsShowcase({
                 </filter>
               </defs>
 
-              {/* Fondo brillante */}
               <circle cx="350" cy="350" r="320" fill="url(#core-glow)" />
-
-              {/* Anillo Orbital Neon Principal */}
               <circle cx="350" cy="350" r="290" stroke="url(#ring-grad-1)" strokeWidth="3" filter="url(#orb-glow)" opacity="0.9" />
               <circle cx="350" cy="350" r="290" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" strokeDasharray="6 8" />
-
-              {/* Anillos Interiores de Datos */}
               <circle cx="350" cy="350" r="210" stroke="#06b6d4" strokeWidth="1.5" strokeDasharray="100 20 50 20" opacity="0.5" />
               <circle cx="350" cy="350" r="140" stroke="#a855f7" strokeWidth="1.5" strokeDasharray="60 15" opacity="0.4" />
 
-              {/* Líneas Ejes de Coordenadas */}
               <line x1="350" y1="30" x2="350" y2="670" stroke="rgba(255, 255, 255, 0.05)" strokeWidth="1" strokeDasharray="4 4" />
               <line x1="30" y1="350" x2="670" y2="350" stroke="rgba(255, 255, 255, 0.05)" strokeWidth="1" strokeDasharray="4 4" />
             </svg>
 
-            {/* NODOS CON PUNTOS LUMINOSOS Y TARJETAS ILUSTRADAS VECTORIALES SVG */}
+            {/* NODOS SOBRE LOS PUNTOS BRILLANTES */}
             <div className="system-badges-ring">
-              {/* Nodo 1: POS Farma - 0 deg (Arriba) */}
               <div className="tech-landmark-node node-pos" style={{ transform: 'rotate(0deg) translateY(-290px)' }}>
                 <span className="glowing-orb-dot emerald" />
                 <div className="node-stalk emerald" />
@@ -333,7 +341,6 @@ export default function ProjectsShowcase({
                 </div>
               </div>
 
-              {/* Nodo 2: CotiPro SaaS - 72 deg */}
               <div className="tech-landmark-node node-cotipro" style={{ transform: 'rotate(72deg) translateY(-290px)' }}>
                 <span className="glowing-orb-dot cyan" />
                 <div className="node-stalk cyan" />
@@ -350,7 +357,6 @@ export default function ProjectsShowcase({
                 </div>
               </div>
 
-              {/* Nodo 3: Vortex 3D - 144 deg */}
               <div className="tech-landmark-node node-vortex" style={{ transform: 'rotate(144deg) translateY(-290px)' }}>
                 <span className="glowing-orb-dot purple" />
                 <div className="node-stalk purple" />
@@ -366,7 +372,6 @@ export default function ProjectsShowcase({
                 </div>
               </div>
 
-              {/* Nodo 4: AI Trailer - 216 deg */}
               <div className="tech-landmark-node node-trailer" style={{ transform: 'rotate(216deg) translateY(-290px)' }}>
                 <span className="glowing-orb-dot amber" />
                 <div className="node-stalk amber" />
@@ -383,7 +388,6 @@ export default function ProjectsShowcase({
                 </div>
               </div>
 
-              {/* Nodo 5: Image Remover - 288 deg */}
               <div className="tech-landmark-node node-remover" style={{ transform: 'rotate(288deg) translateY(-290px)' }}>
                 <span className="glowing-orb-dot pink" />
                 <div className="node-stalk pink" />
@@ -409,10 +413,11 @@ export default function ProjectsShowcase({
           <p className="projects-showcase-description">{description}</p>
         </div>
 
-        {/* Pista horizontal de tarjetas (flotando al frente de la órbita) */}
+        {/* Pista horizontal de tarjetas */}
         <div className="projects-showcase-track-container">
           <div ref={trackRef} className="projects-showcase-track">
             {projects.map((project) => {
+              const isExpanded = expandedCardId === project.id;
               const badgeClass =
                 project.badgeType === 'emerald'
                   ? 'badge-emerald'
@@ -431,56 +436,101 @@ export default function ProjectsShowcase({
               return (
                 <div
                   key={project.id}
-                  className="projects-showcase-card card-large"
+                  className={`projects-showcase-card card-large ${isExpanded ? 'is-expanded' : ''}`}
+                  onClick={() => handleCardClick(project.id)}
                 >
-                  <div className="card-content">
-                    <div>
-                      <div className="card-badge-row">
-                        <span className={`card-badge ${badgeClass}`}>
-                          {project.badge}
-                        </span>
-                        <span className="card-type-icon"><IconComponent size={16} /></span>
+                  {/* CONTENIDO SUPERIOR DE LA TARJETA */}
+                  <div className="card-top-content">
+                    <div className="card-content">
+                      <div>
+                        <div className="card-badge-row">
+                          <span className={`card-badge ${badgeClass}`}>
+                            {project.badge}
+                          </span>
+                          <span className="card-type-icon"><IconComponent size={16} /></span>
+                        </div>
+                        <h3 className="card-title">{project.title}</h3>
+                        <p className="card-description">{project.description}</p>
                       </div>
-                      <h3 className="card-title">{project.title}</h3>
-                      <p className="card-description">{project.description}</p>
+
+                      <div>
+                        <div className="card-tech-stack">
+                          {project.techStack.map((tech, i) => (
+                            <span key={i} className="tech-tag">
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* BOTÓN VER CASO QUE DESPLIEGA EL CUADRO ATRÁS */}
+                        <button
+                          className={`ver-caso-trigger-btn ${isExpanded ? 'active' : ''}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleCardClick(project.id);
+                          }}
+                        >
+                          {isExpanded ? (
+                            <>
+                              Ocultar detalles <X size={14} />
+                            </>
+                          ) : (
+                            <>
+                              Ver caso <ChevronDown size={14} className="chevron-icon" />
+                            </>
+                          )}
+                        </button>
+                      </div>
                     </div>
 
-                    <div>
-                      <div className="card-tech-stack">
-                        {project.techStack.map((tech, i) => (
-                          <span key={i} className="tech-tag">
-                            {tech}
-                          </span>
-                        ))}
+                    {/* Window Mockup Frame */}
+                    <div className="card-mockup-frame">
+                      <div className="mockup-header">
+                        <div className="mockup-dots">
+                          <span className="dot red" />
+                          <span className="dot yellow" />
+                          <span className="dot green" />
+                        </div>
+                        <div className="mockup-url">
+                          {project.domain || `${project.id}.dev`}
+                        </div>
                       </div>
-
-                      {project.link && (
-                        <a
-                          href={project.link}
-                          className="card-link"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          Ver caso <ExternalLink size={14} className="inline-icon" />
-                        </a>
-                      )}
+                      <div className="mockup-body">
+                        {renderProjectPreview(project.previewType)}
+                      </div>
                     </div>
                   </div>
 
-                  {/* Window Mockup Frame con contenido del proyecto */}
-                  <div className="card-mockup-frame">
-                    <div className="mockup-header">
-                      <div className="mockup-dots">
-                        <span className="dot red" />
-                        <span className="dot yellow" />
-                        <span className="dot green" />
+                  {/* CUADRO ATRÁS QUE SE DESPLAZA AL DAR CLICK EN LA TARJETA (ESTILO TRAVEL SLIDER) */}
+                  <div className="card-sliding-panel" onClick={(e) => e.stopPropagation()}>
+                    <div className="panel-inner-container">
+                      <div className="panel-header-row">
+                        <div>
+                          <span className="panel-badge-code">DETALLES Y ARQUITECTURA DE CASO</span>
+                          <h4 className="panel-project-title">{project.title}</h4>
+                        </div>
+                        {project.link && (
+                          <a
+                            href={project.link}
+                            className="panel-ver-caso-btn"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Ir a sitio oficial <ArrowRight size={14} />
+                          </a>
+                        )}
                       </div>
-                      <div className="mockup-url">
-                        {project.domain || `${project.id}.dev`}
+
+                      <div className="panel-grid-info">
+                        <div className="panel-info-box">
+                          <strong className="box-title">Problema & Reto:</strong>
+                          <p className="box-description">{project.problem}</p>
+                        </div>
+                        <div className="panel-info-box">
+                          <strong className="box-title">Decisiones Técnicas de Arquitectura:</strong>
+                          <p className="box-description">{project.architecture}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="mockup-body">
-                      {renderProjectPreview(project.previewType)}
                     </div>
                   </div>
                 </div>
