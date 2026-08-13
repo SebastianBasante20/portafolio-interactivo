@@ -175,20 +175,24 @@ export default function ProjectsShowcase({
       });
 
       scrollTriggerRef.current = st;
+      // Inicialmente deshabilitado para que fuera de las tarjetas el scroll sea vertical
+      st.disable(false);
     }, sectionRef);
 
     return () => ctx.revert();
   }, [projects]);
 
+  // Al colocar el cursor sobre la pista de tarjetas se activa la navegación horizontal por proyectos
   const handleCardsMouseEnter = () => {
     if (scrollTriggerRef.current) {
-      scrollTriggerRef.current.disable(false);
+      scrollTriggerRef.current.enable();
     }
   };
 
+  // Al salir de las tarjetas se restaura el scroll vertical normal
   const handleCardsMouseLeave = () => {
     if (scrollTriggerRef.current) {
-      scrollTriggerRef.current.enable();
+      scrollTriggerRef.current.disable(false);
     }
   };
 
@@ -428,7 +432,7 @@ export default function ProjectsShowcase({
           <p className="projects-showcase-description">{description}</p>
         </div>
 
-        {/* Pista horizontal de tarjetas con control de zona vertical/horizontal */}
+        {/* Pista horizontal de tarjetas: al colocar el cursor dentro se activa el scroll horizontal por proyectos */}
         <div
           className="projects-showcase-track-container"
           onMouseEnter={handleCardsMouseEnter}
@@ -567,7 +571,7 @@ export default function ProjectsShowcase({
             />
           </div>
           <div className="footer-label-row">
-            <span>PORTFOLIO SHOWCASE • ZONA DE TARJETAS = SCROLL VERTICAL</span>
+            <span>PORTFOLIO SHOWCASE • TARJETAS = DESPLAZAMIENTO HORIZONTAL</span>
             <span className="step-counter">
               0{activeStep} / 0{projects.length}
             </span>
