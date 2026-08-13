@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ExternalLink, ShoppingBag, Sparkles, Box, Film, Image, CheckCircle, Database, Layers } from 'lucide-react';
+import { ExternalLink, ShoppingBag, Sparkles, Box, Film, Image, CheckCircle, Database } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './ProjectsShowcase.css';
@@ -144,7 +144,7 @@ export default function ProjectsShowcase({
         },
       });
 
-      // Rotación 360° de la matriz de arquitectura en el fondo
+      // Rotación 360° del Anillo Orbital y Nodos Ilustrados en el fondo
       if (orbit) {
         gsap.to(orbit, {
           rotate: 360,
@@ -272,91 +272,129 @@ export default function ProjectsShowcase({
       )}
 
       <section ref={sectionRef} className="projects-showcase-section">
-        {/* NÚCLEO Y MATRIZ DE ARQUITECTURA DE SOFTWARE (DETRÁS DE LAS TARJETAS) */}
+        {/* ESTRUCTURA ORBITAL Y NODOS ILUSTRADOS VECTORIALES SVG (SOBRE LOS PUNTOS BRILLANTES) */}
         <div className="giant-orbit-wrapper" aria-hidden="true">
           <div ref={orbitRef} className="system-core-container">
-            {/* SVG con anillos de radar y ejes de datos */}
+            {/* SVG Anillo Orbital Neon con Resplandor */}
             <svg className="system-core-svg" viewBox="0 0 700 700" fill="none">
               <defs>
                 <radialGradient id="core-glow" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.25" />
+                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.22" />
                   <stop offset="40%" stopColor="#06b6d4" stopOpacity="0.12" />
                   <stop offset="80%" stopColor="#a855f7" stopOpacity="0.05" />
                   <stop offset="100%" stopColor="#09090b" stopOpacity="0" />
                 </radialGradient>
                 <linearGradient id="ring-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stopColor="#10b981" />
-                  <stop offset="50%" stopColor="#06b6d4" />
-                  <stop offset="100%" stopColor="#a855f7" />
+                  <stop offset="40%" stopColor="#06b6d4" />
+                  <stop offset="80%" stopColor="#a855f7" />
+                  <stop offset="100%" stopColor="#f59e0b" />
                 </linearGradient>
+                <filter id="orb-glow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="6" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
               </defs>
 
-              {/* Resplandor del núcleo */}
+              {/* Fondo brillante */}
               <circle cx="350" cy="350" r="320" fill="url(#core-glow)" />
 
-              {/* Anillos concéntricos de arquitectura */}
-              <circle cx="350" cy="350" r="310" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="1" strokeDasharray="4 8" />
-              <circle cx="350" cy="350" r="290" stroke="url(#ring-grad-1)" strokeWidth="2" strokeDasharray="160 20 40 20" opacity="0.85" />
-              <circle cx="350" cy="350" r="240" stroke="#06b6d4" strokeWidth="1.5" strokeDasharray="80 15 200 15" opacity="0.6" />
-              <circle cx="350" cy="350" r="190" stroke="#a855f7" strokeWidth="1.5" strokeDasharray="120 30" opacity="0.5" />
-              <circle cx="350" cy="350" r="140" stroke="rgba(16, 185, 129, 0.4)" strokeWidth="1" strokeDasharray="6 6" />
-              <circle cx="350" cy="350" r="90" stroke="rgba(255, 255, 255, 0.12)" strokeWidth="1" />
+              {/* Anillo Orbital Neon Principal */}
+              <circle cx="350" cy="350" r="290" stroke="url(#ring-grad-1)" strokeWidth="3" filter="url(#orb-glow)" opacity="0.9" />
+              <circle cx="350" cy="350" r="290" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" strokeDasharray="6 8" />
 
-              {/* Ejes transversales de sistema */}
-              <line x1="350" y1="20" x2="350" y2="680" stroke="rgba(255, 255, 255, 0.06)" strokeWidth="1" strokeDasharray="4 4" />
-              <line x1="20" y1="350" x2="680" y2="350" stroke="rgba(255, 255, 255, 0.06)" strokeWidth="1" strokeDasharray="4 4" />
-              <line x1="117" y1="117" x2="583" y2="583" stroke="rgba(255, 255, 255, 0.04)" strokeWidth="1" strokeDasharray="4 4" />
-              <line x1="583" y1="117" x2="117" y2="583" stroke="rgba(255, 255, 255, 0.04)" strokeWidth="1" strokeDasharray="4 4" />
+              {/* Anillos Interiores de Datos */}
+              <circle cx="350" cy="350" r="210" stroke="#06b6d4" strokeWidth="1.5" strokeDasharray="100 20 50 20" opacity="0.5" />
+              <circle cx="350" cy="350" r="140" stroke="#a855f7" strokeWidth="1.5" strokeDasharray="60 15" opacity="0.4" />
 
-              {/* Indicador del núcleo central */}
-              <circle cx="350" cy="350" r="16" fill="#09090b" stroke="#10b981" strokeWidth="2" />
-              <circle cx="350" cy="350" r="6" fill="#34d399" />
+              {/* Líneas Ejes de Coordenadas */}
+              <line x1="350" y1="30" x2="350" y2="670" stroke="rgba(255, 255, 255, 0.05)" strokeWidth="1" strokeDasharray="4 4" />
+              <line x1="30" y1="350" x2="670" y2="350" stroke="rgba(255, 255, 255, 0.05)" strokeWidth="1" strokeDasharray="4 4" />
             </svg>
 
-            {/* NODOS DE SISTEMA TÉCNICOS SIN EMOJIS EN EL PERÍMETRO */}
+            {/* NODOS CON PUNTOS LUMINOSOS Y TARJETAS ILUSTRADAS VECTORIALES SVG */}
             <div className="system-badges-ring">
               {/* Nodo 1: POS Farma - 0 deg (Arriba) */}
-              <div className="tech-node-badge node-pos" style={{ transform: 'rotate(0deg) translateY(-290px) rotate(0deg)' }}>
-                <span className="node-dot emerald" />
-                <div className="node-info">
-                  <span className="node-code">SYS-01</span>
-                  <span className="node-title">POS Farma</span>
+              <div className="tech-landmark-node node-pos" style={{ transform: 'rotate(0deg) translateY(-290px) rotate(0deg)' }}>
+                <span className="glowing-orb-dot emerald" />
+                <div className="node-stalk emerald" />
+                <div className="landmark-card emerald">
+                  <svg className="landmark-svg" viewBox="0 0 32 32" fill="none">
+                    <rect x="4" y="6" width="24" height="16" rx="3" stroke="#10b981" strokeWidth="2" fill="rgba(16, 185, 129, 0.18)" />
+                    <path d="M 12 11 H 20 M 16 7 V 15" stroke="#34d399" strokeWidth="2" strokeLinecap="round" />
+                    <path d="M 8 26 H 24 M 16 22 V 26" stroke="#10b981" strokeWidth="2" />
+                  </svg>
+                  <div className="landmark-text">
+                    <strong>POS Farma</strong>
+                    <small>POS Terminal & SQLite</small>
+                  </div>
                 </div>
               </div>
 
               {/* Nodo 2: CotiPro SaaS - 72 deg */}
-              <div className="tech-node-badge node-cotipro" style={{ transform: 'rotate(72deg) translateY(-290px) rotate(-72deg)' }}>
-                <span className="node-dot cyan" />
-                <div className="node-info">
-                  <span className="node-code">SYS-02</span>
-                  <span className="node-title">CotiPro SaaS</span>
+              <div className="tech-landmark-node node-cotipro" style={{ transform: 'rotate(72deg) translateY(-290px) rotate(-72deg)' }}>
+                <span className="glowing-orb-dot cyan" />
+                <div className="node-stalk cyan" />
+                <div className="landmark-card cyan">
+                  <svg className="landmark-svg" viewBox="0 0 32 32" fill="none">
+                    <path d="M 8 4 H 20 L 26 10 V 26 C 26 27.1 25.1 28 24 28 H 8 C 6.9 28 6 27.1 6 26 V 6 C 6 4.9 6.9 4 8 4 Z" stroke="#06b6d4" strokeWidth="2" fill="rgba(6, 182, 212, 0.18)" />
+                    <path d="M 12 16 L 15 19 L 21 13" stroke="#22d3ee" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <circle cx="23" cy="7" r="2" fill="#38bdf8" />
+                  </svg>
+                  <div className="landmark-text">
+                    <strong>CotiPro SaaS</strong>
+                    <small>Firma Digital & IA</small>
+                  </div>
                 </div>
               </div>
 
               {/* Nodo 3: Vortex 3D - 144 deg */}
-              <div className="tech-node-badge node-vortex" style={{ transform: 'rotate(144deg) translateY(-290px) rotate(-144deg)' }}>
-                <span className="node-dot purple" />
-                <div className="node-info">
-                  <span className="node-code">SYS-03</span>
-                  <span className="node-title">Vortex 3D</span>
+              <div className="tech-landmark-node node-vortex" style={{ transform: 'rotate(144deg) translateY(-290px) rotate(-144deg)' }}>
+                <span className="glowing-orb-dot purple" />
+                <div className="node-stalk purple" />
+                <div className="landmark-card purple">
+                  <svg className="landmark-svg" viewBox="0 0 32 32" fill="none">
+                    <path d="M 16 3 L 28 9 V 23 L 16 29 L 4 23 V 9 Z" stroke="#a855f7" strokeWidth="2" fill="rgba(168, 85, 247, 0.18)" />
+                    <path d="M 16 3 V 29 M 4 9 L 28 23 M 28 9 L 4 23" stroke="#c084fc" strokeWidth="1.2" />
+                  </svg>
+                  <div className="landmark-text">
+                    <strong>Vortex 3D</strong>
+                    <small>Motor GSAP & Canvas</small>
+                  </div>
                 </div>
               </div>
 
               {/* Nodo 4: AI Trailer - 216 deg */}
-              <div className="tech-node-badge node-trailer" style={{ transform: 'rotate(216deg) translateY(-290px) rotate(-216deg)' }}>
-                <span className="node-dot amber" />
-                <div className="node-info">
-                  <span className="node-code">SYS-04</span>
-                  <span className="node-title">AI Trailer</span>
+              <div className="tech-landmark-node node-trailer" style={{ transform: 'rotate(216deg) translateY(-290px) rotate(-216deg)' }}>
+                <span className="glowing-orb-dot amber" />
+                <div className="node-stalk amber" />
+                <div className="landmark-card amber">
+                  <svg className="landmark-svg" viewBox="0 0 32 32" fill="none">
+                    <rect x="4" y="8" width="24" height="18" rx="3" stroke="#f59e0b" strokeWidth="2" fill="rgba(245, 158, 11, 0.18)" />
+                    <path d="M 13 13 L 21 17 L 13 21 Z" fill="#fbbf24" />
+                    <path d="M 4 12 H 28" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="3 3" />
+                  </svg>
+                  <div className="landmark-text">
+                    <strong>AI Trailer</strong>
+                    <small>Generador de Video</small>
+                  </div>
                 </div>
               </div>
 
               {/* Nodo 5: Image Remover - 288 deg */}
-              <div className="tech-node-badge node-remover" style={{ transform: 'rotate(288deg) translateY(-290px) rotate(-288deg)' }}>
-                <span className="node-dot pink" />
-                <div className="node-info">
-                  <span className="node-code">SYS-05</span>
-                  <span className="node-title">Bg Remover</span>
+              <div className="tech-landmark-node node-remover" style={{ transform: 'rotate(288deg) translateY(-290px) rotate(-288deg)' }}>
+                <span className="glowing-orb-dot pink" />
+                <div className="node-stalk pink" />
+                <div className="landmark-card pink">
+                  <svg className="landmark-svg" viewBox="0 0 32 32" fill="none">
+                    <rect x="5" y="5" width="22" height="22" rx="4" stroke="#ec4899" strokeWidth="2" fill="rgba(236, 72, 153, 0.18)" />
+                    <circle cx="12" cy="12" r="3" fill="#f472b6" />
+                    <path d="M 7 24 L 14 17 L 19 21 L 22 18 L 27 24" stroke="#ec4899" strokeWidth="2" strokeLinecap="round" />
+                  </svg>
+                  <div className="landmark-text">
+                    <strong>Bg Remover</strong>
+                    <small>Canvas Alpha API</small>
+                  </div>
                 </div>
               </div>
             </div>
@@ -369,7 +407,7 @@ export default function ProjectsShowcase({
           <p className="projects-showcase-description">{description}</p>
         </div>
 
-        {/* Pista horizontal de tarjetas (flotando al frente del núcleo técnico) */}
+        {/* Pista horizontal de tarjetas (flotando al frente de la órbita) */}
         <div className="projects-showcase-track-container">
           <div ref={trackRef} className="projects-showcase-track">
             {projects.map((project) => {

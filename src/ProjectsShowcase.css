@@ -1,5 +1,5 @@
 /* ==========================================================================
-   PROJECTS SHOWCASE - SYSTEM ARCHITECTURE CORE ORBIT (NO EMOJIS)
+   PROJECTS SHOWCASE - NEON ORBIT & GLOWING ORB LANDMARK NODES
    ========================================================================== */
 
 .projects-showcase-wrapper {
@@ -35,7 +35,7 @@
   box-sizing: border-box;
 }
 
-/* NÚCLEO Y MATRIZ DE ARQUITECTURA DE SOFTWARE (DETRÁS DE LAS TARJETAS) */
+/* ESTRUCTURA ORBITAL EN EL FONDO (DETRÁS DE LAS TARJETAS) */
 .giant-orbit-wrapper {
   position: absolute;
   top: 62%;
@@ -65,10 +65,9 @@
 .system-core-svg {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 0 30px rgba(16, 185, 129, 0.25));
 }
 
-/* NODOS TÉCNICOS EN EL PERÍMETRO DEL SISTEMA (SIN EMOJIS) */
+/* NODOS LANDMARK SOBRE LOS PUNTOS LUMINOSOS */
 .system-badges-ring {
   position: absolute;
   inset: 0;
@@ -77,57 +76,106 @@
   justify-content: center;
 }
 
-.tech-node-badge {
+.tech-landmark-node {
   position: absolute;
   top: 50%;
   left: 50%;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.35rem 0.65rem;
-  background: rgba(13, 15, 23, 0.95);
-  border-radius: 0.5rem;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.8), 0 0 12px rgba(255, 255, 255, 0.08);
+  margin-top: -12px;
+  margin-left: -70px;
+  transform-origin: center center;
+}
+
+/* PUNTO LUMINOSO NEON (EXACTAMENTE IGUAL A TU CAPTURA DE PANTALLA) */
+.glowing-orb-dot {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 9999px;
+  z-index: 2;
+}
+
+.glowing-orb-dot.emerald {
+  background-color: #10b981;
+  box-shadow: 0 0 16px #10b981, 0 0 30px rgba(16, 185, 129, 0.8);
+}
+
+.glowing-orb-dot.cyan {
+  background-color: #06b6d4;
+  box-shadow: 0 0 16px #06b6d4, 0 0 30px rgba(6, 182, 212, 0.8);
+}
+
+.glowing-orb-dot.purple {
+  background-color: #a855f7;
+  box-shadow: 0 0 16px #a855f7, 0 0 30px rgba(168, 85, 247, 0.8);
+}
+
+.glowing-orb-dot.amber {
+  background-color: #f59e0b;
+  box-shadow: 0 0 16px #f59e0b, 0 0 30px rgba(245, 158, 11, 0.8);
+}
+
+.glowing-orb-dot.pink {
+  background-color: #ec4899;
+  box-shadow: 0 0 16px #ec4899, 0 0 30px rgba(236, 72, 153, 0.8);
+}
+
+/* TALLO CONECTOR */
+.node-stalk {
+  width: 2px;
+  height: 1rem;
+  z-index: 1;
+}
+
+.node-stalk.emerald { background: linear-gradient(to bottom, #10b981, transparent); }
+.node-stalk.cyan { background: linear-gradient(to bottom, #06b6d4, transparent); }
+.node-stalk.purple { background: linear-gradient(to bottom, #a855f7, transparent); }
+.node-stalk.amber { background: linear-gradient(to bottom, #f59e0b, transparent); }
+.node-stalk.pink { background: linear-gradient(to bottom, #ec4899, transparent); }
+
+/* TARJETA LANDMARK ILUSTRADA SVG */
+.landmark-card {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.4rem 0.75rem;
+  background: rgba(14, 16, 24, 0.95);
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.15);
-  margin-top: -15px;
-  margin-left: -60px;
-  transform-origin: center center;
   white-space: nowrap;
 }
 
-.node-dot {
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 9999px;
+.landmark-card.emerald { border-color: rgba(16, 185, 129, 0.45); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85), 0 0 20px rgba(16, 185, 129, 0.25); }
+.landmark-card.cyan { border-color: rgba(6, 182, 212, 0.45); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85), 0 0 20px rgba(6, 182, 212, 0.25); }
+.landmark-card.purple { border-color: rgba(168, 85, 247, 0.45); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85), 0 0 20px rgba(168, 85, 247, 0.25); }
+.landmark-card.amber { border-color: rgba(245, 158, 11, 0.45); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85), 0 0 20px rgba(245, 158, 11, 0.25); }
+.landmark-card.pink { border-color: rgba(236, 72, 153, 0.45); box-shadow: 0 12px 30px rgba(0, 0, 0, 0.85), 0 0 20px rgba(236, 72, 153, 0.25); }
+
+.landmark-svg {
+  width: 1.5rem;
+  height: 1.5rem;
   flex-shrink: 0;
-  box-shadow: 0 0 8px currentColor;
 }
 
-.node-dot.emerald { background-color: #10b981; color: #10b981; }
-.node-dot.cyan { background-color: #06b6d4; color: #06b6d4; }
-.node-dot.purple { background-color: #a855f7; color: #a855f7; }
-.node-dot.amber { background-color: #f59e0b; color: #f59e0b; }
-.node-dot.pink { background-color: #ec4899; color: #ec4899; }
-
-.node-info {
+.landmark-text {
   display: flex;
   flex-direction: column;
   line-height: 1.1;
   text-align: left;
 }
 
-.node-code {
-  font-family: monospace;
-  font-size: 0.625rem;
-  color: #71717a;
-  letter-spacing: 0.05em;
+.landmark-text strong {
+  font-size: 0.8125rem;
+  color: #ffffff;
+  font-weight: 800;
 }
 
-.node-title {
-  font-size: 0.75rem;
-  color: #ffffff;
-  font-weight: 700;
+.landmark-text small {
+  font-size: 0.625rem;
+  color: #a1a1aa;
   font-family: monospace;
 }
 
@@ -190,7 +238,7 @@
   }
 }
 
-/* Track Container (Flotando sobre la matriz técnica en z-index 10) */
+/* Track Container (Flotando sobre la órbita en z-index 10) */
 .projects-showcase-track-container {
   position: relative;
   width: 100%;
@@ -425,7 +473,7 @@
   overflow: hidden;
 }
 
-/* Vistas previas específicas de cada proyecto (sin emojis) */
+/* Vistas previas específicas de cada proyecto */
 .preview-pos {
   display: flex;
   flex-direction: column;
