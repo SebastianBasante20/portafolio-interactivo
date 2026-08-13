@@ -122,6 +122,7 @@ export default function ProjectsShowcase({
   const trackRef = useRef<HTMLDivElement>(null);
   const orbitRef = useRef<HTMLDivElement>(null);
   const orbitContainerRef = useRef<HTMLDivElement>(null);
+  const gridFloorRef = useRef<HTMLDivElement>(null);
   const coreGlowRef = useRef<SVGStopElement>(null);
   const [activeStep, setActiveStep] = useState(1);
   const [progressPercent, setProgressPercent] = useState(0);
@@ -194,24 +195,34 @@ export default function ProjectsShowcase({
     return () => ctx.revert();
   }, [projects]);
 
-  // Efecto Parallax 3D interactivo en el fondo espacial al mover el mouse
+  // Efecto Parallax 3D PROFUNDO en múltiples planos z al mover el mouse
   const handleSectionMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const section = sectionRef.current;
     const orbitContainer = orbitContainerRef.current;
+    const gridFloor = gridFloorRef.current;
     if (!section || !orbitContainer) return;
 
     const { width, height, left, top } = section.getBoundingClientRect();
     const mouseX = (e.clientX - left - width / 2) / (width / 2);
     const mouseY = (e.clientY - top - height / 2) / (height / 2);
 
-    // Inclinar la estructura orbital del fondo en espacio 3D
+    // Inclinar con gran amplitud la estructura orbital tridimensional
     gsap.to(orbitContainer, {
-      rotateY: mouseX * 18,
-      rotateX: -mouseY * 18,
-      translateZ: 30,
-      duration: 0.7,
+      rotateY: mouseX * 36,
+      rotateX: -mouseY * 36,
+      translateZ: 60,
+      duration: 0.6,
       ease: 'power2.out',
     });
+
+    if (gridFloor) {
+      gsap.to(gridFloor, {
+        rotateY: mouseX * 20,
+        rotateX: 75 - mouseY * 15,
+        duration: 0.8,
+        ease: 'power2.out',
+      });
+    }
   };
 
   const handleSectionMouseLeave = () => {
@@ -220,6 +231,14 @@ export default function ProjectsShowcase({
         rotateY: 0,
         rotateX: 0,
         translateZ: 0,
+        duration: 1.2,
+        ease: 'power2.out',
+      });
+    }
+    if (gridFloorRef.current) {
+      gsap.to(gridFloorRef.current, {
+        rotateY: 0,
+        rotateX: 75,
         duration: 1.2,
         ease: 'power2.out',
       });
@@ -257,13 +276,14 @@ export default function ProjectsShowcase({
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    const rotateX = ((y - centerY) / centerY) * -6;
-    const rotateY = ((x - centerX) / centerX) * 6;
+    const rotateX = ((y - centerY) / centerY) * -10;
+    const rotateY = ((x - centerX) / centerX) * 10;
 
     gsap.to(card, {
       rotateX,
       rotateY,
-      transformPerspective: 1000,
+      translateZ: 80,
+      transformPerspective: 800,
       duration: 0.25,
       ease: 'power1.out',
     });
@@ -277,7 +297,8 @@ export default function ProjectsShowcase({
     gsap.to(card, {
       rotateX: 0,
       rotateY: 0,
-      duration: 0.4,
+      translateZ: 40,
+      duration: 0.45,
       ease: 'power2.out',
     });
   };
@@ -415,19 +436,24 @@ export default function ProjectsShowcase({
         onMouseMove={handleSectionMouseMove}
         onMouseLeave={handleSectionMouseLeave}
       >
-        {/* FONDO ORBITAL CON ESPACIO DE PERSPECTIVA 3D */}
+        {/* PLANO DE GRILLA 3D EN EL SUELO CON PROFUNDIDAD ESPACIAL */}
+        <div ref={gridFloorRef} className="grid-floor-3d-plane" aria-hidden="true" />
+
+        {/* FONDO ORBITAL CON ESPACIO DE PERSPECTIVA 3D PROFUNDA */}
         <div className="giant-orbit-wrapper" aria-hidden="true">
           <div ref={orbitContainerRef} className="orbit-3d-perspective-container">
-            {/* ANILLOS 3D EN PLANO DE PROFUNDIDAD Z */}
+            {/* MULTICAPAS 3D EN DISTINTOS PLANOS Z */}
+            <div className="bg-3d-tilted-ring ring-deep-back" />
             <div className="bg-3d-tilted-ring ring-back" />
             <div className="bg-3d-tilted-ring ring-mid" />
+            <div className="bg-3d-tilted-ring ring-front" />
 
             <div ref={orbitRef} className="system-core-container">
               <svg className="system-core-svg" viewBox="0 0 700 700" fill="none">
                 <defs>
                   <radialGradient id="core-glow" cx="50%" cy="50%" r="50%">
-                    <stop ref={coreGlowRef} offset="0%" stopColor="#10b981" stopOpacity="0.28" />
-                    <stop offset="50%" stopColor="#06b6d4" stopOpacity="0.1" />
+                    <stop ref={coreGlowRef} offset="0%" stopColor="#10b981" stopOpacity="0.35" />
+                    <stop offset="50%" stopColor="#06b6d4" stopOpacity="0.15" />
                     <stop offset="100%" stopColor="#09090b" stopOpacity="0" />
                   </radialGradient>
                   <linearGradient id="ring-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -437,24 +463,24 @@ export default function ProjectsShowcase({
                     <stop offset="100%" stopColor="#f59e0b" />
                   </linearGradient>
                   <filter id="orb-glow" x="-20%" y="-20%" width="140%" height="140%">
-                    <feGaussianBlur stdDeviation="6" result="blur" />
+                    <feGaussianBlur stdDeviation="8" result="blur" />
                     <feComposite in="SourceGraphic" in2="blur" operator="over" />
                   </filter>
                 </defs>
 
                 <circle cx="350" cy="350" r="320" fill="url(#core-glow)" />
-                <circle cx="350" cy="350" r="290" stroke="url(#ring-grad-1)" strokeWidth="3" filter="url(#orb-glow)" opacity="0.9" />
-                <circle cx="350" cy="350" r="290" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" strokeDasharray="6 8" />
-                <circle cx="350" cy="350" r="210" stroke="#06b6d4" strokeWidth="1.5" strokeDasharray="100 20 50 20" opacity="0.5" />
-                <circle cx="350" cy="350" r="140" stroke="#a855f7" strokeWidth="1.5" strokeDasharray="60 15" opacity="0.4" />
+                <circle cx="350" cy="350" r="290" stroke="url(#ring-grad-1)" strokeWidth="4" filter="url(#orb-glow)" opacity="0.9" />
+                <circle cx="350" cy="350" r="290" stroke="rgba(255, 255, 255, 0.2)" strokeWidth="1" strokeDasharray="6 8" />
+                <circle cx="350" cy="350" r="210" stroke="#06b6d4" strokeWidth="2" strokeDasharray="100 20 50 20" opacity="0.6" />
+                <circle cx="350" cy="350" r="140" stroke="#a855f7" strokeWidth="2" strokeDasharray="60 15" opacity="0.5" />
 
-                <line x1="350" y1="30" x2="350" y2="670" stroke="rgba(255, 255, 255, 0.05)" strokeWidth="1" strokeDasharray="4 4" />
-                <line x1="30" y1="350" x2="670" y2="350" stroke="rgba(255, 255, 255, 0.05)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="350" y1="30" x2="350" y2="670" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="1.5" strokeDasharray="4 4" />
+                <line x1="30" y1="350" x2="670" y2="350" stroke="rgba(255, 255, 255, 0.08)" strokeWidth="1.5" strokeDasharray="4 4" />
               </svg>
 
-              {/* NODOS CON INSIGNIAS SVG SOBRE PUNTOS BRILLANTES */}
+              {/* NODOS CON INSIGNIAS SVG ELEVADOS EN 3D (+50px) */}
               <div className="system-badges-ring">
-                <div className="tech-landmark-node node-pos" style={{ transform: 'rotate(0deg) translateY(-290px)' }}>
+                <div className="tech-landmark-node node-pos" style={{ transform: 'rotate(0deg) translateY(-290px) translateZ(50px)' }}>
                   <span className="glowing-orb-dot emerald" />
                   <div className="node-stalk emerald" />
                   <div className="landmark-card emerald">
@@ -470,7 +496,7 @@ export default function ProjectsShowcase({
                   </div>
                 </div>
 
-                <div className="tech-landmark-node node-cotipro" style={{ transform: 'rotate(72deg) translateY(-290px)' }}>
+                <div className="tech-landmark-node node-cotipro" style={{ transform: 'rotate(72deg) translateY(-290px) translateZ(50px)' }}>
                   <span className="glowing-orb-dot cyan" />
                   <div className="node-stalk cyan" />
                   <div className="landmark-card cyan">
@@ -486,7 +512,7 @@ export default function ProjectsShowcase({
                   </div>
                 </div>
 
-                <div className="tech-landmark-node node-vortex" style={{ transform: 'rotate(144deg) translateY(-290px)' }}>
+                <div className="tech-landmark-node node-vortex" style={{ transform: 'rotate(144deg) translateY(-290px) translateZ(50px)' }}>
                   <span className="glowing-orb-dot purple" />
                   <div className="node-stalk purple" />
                   <div className="landmark-card purple">
@@ -501,7 +527,7 @@ export default function ProjectsShowcase({
                   </div>
                 </div>
 
-                <div className="tech-landmark-node node-trailer" style={{ transform: 'rotate(216deg) translateY(-290px)' }}>
+                <div className="tech-landmark-node node-trailer" style={{ transform: 'rotate(216deg) translateY(-290px) translateZ(50px)' }}>
                   <span className="glowing-orb-dot amber" />
                   <div className="node-stalk amber" />
                   <div className="landmark-card amber">
@@ -517,7 +543,7 @@ export default function ProjectsShowcase({
                   </div>
                 </div>
 
-                <div className="tech-landmark-node node-remover" style={{ transform: 'rotate(288deg) translateY(-290px)' }}>
+                <div className="tech-landmark-node node-remover" style={{ transform: 'rotate(288deg) translateY(-290px) translateZ(50px)' }}>
                   <span className="glowing-orb-dot pink" />
                   <div className="node-stalk pink" />
                   <div className="landmark-card pink">
@@ -543,7 +569,7 @@ export default function ProjectsShowcase({
           <p className="projects-showcase-description">{description}</p>
         </div>
 
-        {/* Pista horizontal de tarjetas con efecto 3D tilt y reflejo espectral */}
+        {/* Pista horizontal de tarjetas elevadas en el plano Z (+40px) con tilt 3D pronunciado */}
         <div className="projects-showcase-track-container">
           <div ref={trackRef} className="projects-showcase-track">
             {projects.map((project) => {
