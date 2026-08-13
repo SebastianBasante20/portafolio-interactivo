@@ -119,7 +119,7 @@ export default function ProjectsShowcase({
   const [progressPercent, setProgressPercent] = useState(0);
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
 
-  // Estado para arrastre con el mouse / drag-to-slide
+  // Estado para arrastre directo con el mouse
   const isDraggingRef = useRef(false);
   const startXRef = useRef(0);
   const [isDraggingState, setIsDraggingState] = useState(false);
@@ -142,21 +142,21 @@ export default function ProjectsShowcase({
       const snapIncrement = 1 / (projects.length - 1);
       const nodeAngles = [0, 72, 144, 216, 288];
 
-      // Desplazamiento horizontal con Snap suave por tarjeta + animación fluida
+      // Desplazamiento ultra-rápido instantáneo 1:1 sin lag / sin retraso
       gsap.to(track, {
         x: getScrollAmount,
-        ease: 'power1.out',
+        ease: 'none',
         scrollTrigger: {
           trigger: section,
           start: 'top top',
           end: () => `+=${track.scrollWidth}`,
           pin: true,
-          scrub: 0.8, // Transición suave sin frenadas bruscas
+          scrub: true, // Respuesta 1:1 inmediata al mover la rueda del mouse
           snap: {
             snapTo: snapIncrement,
-            duration: { min: 0.35, max: 0.65 },
-            ease: 'power2.inOut',
-            delay: 0.05,
+            duration: 0.22,
+            ease: 'power1.out',
+            delay: 0, // Cero retraso antes de centrar
           },
           invalidateOnRefresh: true,
           onUpdate: (self) => {
@@ -168,13 +168,13 @@ export default function ProjectsShowcase({
             );
             setActiveStep(step);
 
-            // Rotación fluida del anillo de órbita
+            // Rotación 1:1 inmediata del anillo de órbita
             const orbitRotation = -p * 288;
             if (orbit) {
               gsap.set(orbit, { rotate: orbitRotation });
             }
 
-            // Contrarrotar las insignias para mantener texto e iconos 100% verticales
+            // Contrarrotación inmediata de insignias
             const cards = section.querySelectorAll('.landmark-card');
             cards.forEach((card, idx) => {
               const baseAngle = nodeAngles[idx] || 0;
@@ -190,12 +190,11 @@ export default function ProjectsShowcase({
   }, [projects]);
 
   const handleCardClick = (id: string) => {
-    // Si el usuario estaba arrastrando con el mouse, ignorar el click de expansión
     if (isDraggingRef.current) return;
     setExpandedCardId((prev) => (prev === id ? null : id));
   };
 
-  // Manejadores de arrastre con el mouse / touch drag
+  // Arrastre con el mouse súper fluido sin retardo
   const handleMouseDown = (e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('button, a')) return;
     isDraggingRef.current = false;
@@ -203,10 +202,10 @@ export default function ProjectsShowcase({
 
     const handleMouseMove = (moveEvent: MouseEvent) => {
       const deltaX = startXRef.current - moveEvent.clientX;
-      if (Math.abs(deltaX) > 5) {
+      if (Math.abs(deltaX) > 2) {
         isDraggingRef.current = true;
         setIsDraggingState(true);
-        window.scrollBy({ top: deltaX * 1.6, behavior: 'instant' as ScrollBehavior });
+        window.scrollBy(0, deltaX * 2);
         startXRef.current = moveEvent.clientX;
       }
     };
@@ -217,7 +216,7 @@ export default function ProjectsShowcase({
       setTimeout(() => {
         isDraggingRef.current = false;
         setIsDraggingState(false);
-      }, 50);
+      }, 30);
     };
 
     window.addEventListener('mousemove', handleMouseMove);
@@ -456,7 +455,7 @@ export default function ProjectsShowcase({
           <p className="projects-showcase-description">{description}</p>
         </div>
 
-        {/* Pista horizontal de tarjetas con soporte de arrastre por mouse/drag */}
+        {/* Pista horizontal de tarjetas con soporte de arrastre 1:1 */}
         <div
           className={`projects-showcase-track-container ${isDraggingState ? 'is-dragging' : ''}`}
           onMouseDown={handleMouseDown}
