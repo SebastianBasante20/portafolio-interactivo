@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ExternalLink, ShoppingBag, Sparkles, Box, Film, Image, CheckCircle, Database, Cpu } from 'lucide-react';
+import { ExternalLink, ShoppingBag, Sparkles, Box, Film, Image, CheckCircle, Database } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './ProjectsShowcase.css';
@@ -102,7 +102,7 @@ export default function ProjectsShowcase({
 }: ProjectsShowcaseProps) {
   const sectionRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
-  const orbitRef = useRef<SVGSVGElement>(null);
+  const orbitRef = useRef<HTMLDivElement>(null);
   const [activeStep, setActiveStep] = useState(1);
   const [progressPercent, setProgressPercent] = useState(0);
 
@@ -144,7 +144,7 @@ export default function ProjectsShowcase({
         },
       });
 
-      // Rotación 360° del gran globo en el fondo detrás de las tarjetas
+      // Rotación de 360° del Planeta 3D y Banderas Tecnológicas en el fondo
       if (orbit) {
         gsap.to(orbit, {
           rotate: 360,
@@ -272,69 +272,113 @@ export default function ProjectsShowcase({
       )}
 
       <section ref={sectionRef} className="projects-showcase-section">
-        {/* GRAN GLOBO / ÓRBITA CIRCULAR EN EL FONDO (DETRÁS DE LAS TARJETAS Y OCUPANDO LA PANTALLA) */}
+        {/* GLOBO PLANETARIO 3D VIBRANTE Y BANDERAS TECNOLÓGICAS (DETRÁS DE LAS TARJETAS) */}
         <div className="giant-orbit-wrapper" aria-hidden="true">
-          <svg
-            ref={orbitRef}
-            className="giant-orbit-svg"
-            viewBox="0 0 600 600"
-            fill="none"
-          >
-            {/* Anillos atmosféricos del planeta / globo */}
-            <circle cx="300" cy="300" r="280" stroke="rgba(16, 185, 129, 0.18)" strokeWidth="2" strokeDasharray="8 8" />
-            <circle cx="300" cy="300" r="240" stroke="rgba(6, 182, 212, 0.25)" strokeWidth="1.5" />
-            <circle cx="300" cy="300" r="200" fill="url(#globe-gradient)" opacity="0.25" />
+          <div ref={orbitRef} className="planet-container">
+            {/* Esfera 3D del Planeta estilo Travel Slider */}
+            <svg className="planet-globe-svg" viewBox="0 0 700 700" fill="none">
+              <defs>
+                <radialGradient id="ocean-grad" cx="40%" cy="35%" r="65%">
+                  <stop offset="0%" stopColor="#38bdf8" />
+                  <stop offset="45%" stopColor="#0284c7" />
+                  <stop offset="85%" stopColor="#0369a1" />
+                  <stop offset="100%" stopColor="#0f172a" />
+                </radialGradient>
+                <radialGradient id="atmosphere-glow" cx="50%" cy="50%" r="50%">
+                  <stop offset="70%" stopColor="rgba(56, 189, 248, 0)" />
+                  <stop offset="92%" stopColor="rgba(56, 189, 248, 0.4)" />
+                  <stop offset="100%" stopColor="rgba(16, 185, 129, 0.65)" />
+                </radialGradient>
+                <filter id="glow-filter" x="-20%" y="-20%" width="140%" height="140%">
+                  <feGaussianBlur stdDeviation="14" result="blur" />
+                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                </filter>
+              </defs>
 
-            <defs>
-              <radialGradient id="globe-gradient" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#10b981" stopOpacity="0.4" />
-                <stop offset="60%" stopColor="#06b6d4" stopOpacity="0.15" />
-                <stop offset="100%" stopColor="#09090b" stopOpacity="0" />
-              </radialGradient>
-            </defs>
+              {/* Anillos de atmósfera exterior */}
+              <circle cx="350" cy="350" r="325" fill="none" stroke="rgba(56, 189, 248, 0.35)" strokeWidth="2" strokeDasharray="6 8" />
+              <circle cx="350" cy="350" r="300" fill="none" stroke="rgba(16, 185, 129, 0.45)" strokeWidth="2" filter="url(#glow-filter)" />
 
-            {/* Líneas de latitud y longitud del globo terráqueo */}
-            <ellipse cx="300" cy="300" rx="240" ry="90" stroke="rgba(255,255,255,0.08)" strokeWidth="1.5" />
-            <ellipse cx="300" cy="300" rx="240" ry="160" stroke="rgba(255,255,255,0.08)" strokeWidth="1.5" />
-            <line x1="300" y1="60" x2="300" y2="540" stroke="rgba(255,255,255,0.08)" strokeWidth="1.5" strokeDasharray="6 6" />
-            <line x1="60" y1="300" x2="540" y2="300" stroke="rgba(255,255,255,0.08)" strokeWidth="1.5" strokeDasharray="6 6" />
+              {/* Esfera Base del Planeta */}
+              <circle cx="350" cy="350" r="280" fill="url(#ocean-grad)" />
 
-            {/* Nodos de tecnología / monumentos alrededor del perímetro del gran globo */}
-            {/* Nodo 1: POS Farma - Top (0°) */}
-            <g transform="translate(300, 60)">
-              <circle cx="0" cy="0" r="24" fill="#09090b" stroke="#10b981" strokeWidth="2.5" />
-              <text x="0" y="4" textAnchor="middle" fill="#34d399" fontSize="10" fontWeight="bold" fontFamily="monospace">POS</text>
-              <text x="0" y="-34" textAnchor="middle" fill="#10b981" fontSize="12" fontWeight="bold" fontFamily="sans-serif">FARMA</text>
-            </g>
+              {/* Capa de Atmósfera Brillante */}
+              <circle cx="350" cy="350" r="280" fill="url(#atmosphere-glow)" />
 
-            {/* Nodo 2: CotiPro - 72° */}
-            <g transform="translate(528, 226)">
-              <circle cx="0" cy="0" r="24" fill="#09090b" stroke="#06b6d4" strokeWidth="2.5" />
-              <text x="0" y="4" textAnchor="middle" fill="#22d3ee" fontSize="10" fontWeight="bold" fontFamily="monospace">SAAS</text>
-              <text x="40" y="4" textAnchor="start" fill="#06b6d4" fontSize="12" fontWeight="bold" fontFamily="sans-serif">COTIPRO</text>
-            </g>
+              {/* Continentes Esmeralda Estilizados */}
+              <g fill="#10b981" opacity="0.92">
+                <path d="M 210 180 Q 230 150 270 170 Q 300 190 280 250 Q 260 270 290 320 Q 320 370 280 440 Q 250 480 230 420 Q 220 360 240 310 Q 210 270 190 220 Z" />
+                <path d="M 370 160 Q 420 140 450 170 Q 430 220 400 240 Q 420 300 460 350 Q 430 430 380 450 Q 360 380 370 320 Q 350 250 370 160 Z" />
+                <path d="M 480 180 Q 560 170 580 230 Q 540 280 500 260 Q 520 330 560 370 Q 540 430 490 400 Q 470 340 480 180 Z" />
+              </g>
 
-            {/* Nodo 3: Vortex - 144° */}
-            <g transform="translate(441, 494)">
-              <circle cx="0" cy="0" r="24" fill="#09090b" stroke="#a855f7" strokeWidth="2.5" />
-              <text x="0" y="4" textAnchor="middle" fill="#c084fc" fontSize="10" fontWeight="bold" fontFamily="monospace">3D</text>
-              <text x="0" y="42" textAnchor="middle" fill="#a855f7" fontSize="12" fontWeight="bold" fontFamily="sans-serif">VORTEX</text>
-            </g>
+              {/* Líneas de Latitud y Longitud */}
+              <g stroke="rgba(255, 255, 255, 0.18)" strokeWidth="1.5" fill="none">
+                <ellipse cx="350" cy="350" rx="280" ry="110" />
+                <ellipse cx="350" cy="350" rx="280" ry="200" />
+                <ellipse cx="350" cy="350" rx="130" ry="280" />
+                <ellipse cx="350" cy="350" rx="220" ry="280" />
+              </g>
+            </svg>
 
-            {/* Nodo 4: AI Trailer - 216° */}
-            <g transform="translate(159, 494)">
-              <circle cx="0" cy="0" r="24" fill="#09090b" stroke="#f59e0b" strokeWidth="2.5" />
-              <text x="0" y="4" textAnchor="middle" fill="#fbbf24" fontSize="10" fontWeight="bold" fontFamily="monospace">AI</text>
-              <text x="0" y="42" textAnchor="middle" fill="#f59e0b" fontSize="12" fontWeight="bold" fontFamily="sans-serif">TRAILER</text>
-            </g>
+            {/* BANDERAS TECNOLÓGICAS 3D ROTANDO EN LA CURVATURA SUPERIOR DEL PLANETA */}
+            <div className="planet-badges-ring">
+              {/* Nodo 1: POS Farma - 0 deg (Arriba) */}
+              <div className="tech-flag-badge badge-pos" style={{ transform: 'rotate(0deg) translateY(-295px) rotate(0deg)' }}>
+                <div className="flag-content emerald">
+                  <span className="flag-icon">💊</span>
+                  <div className="flag-text">
+                    <strong>POS Farma</strong>
+                    <small>Desktop • SQLite</small>
+                  </div>
+                </div>
+              </div>
 
-            {/* Nodo 5: Bg Remover - 288° */}
-            <g transform="translate(72, 226)">
-              <circle cx="0" cy="0" r="24" fill="#09090b" stroke="#ec4899" strokeWidth="2.5" />
-              <text x="0" y="4" textAnchor="middle" fill="#f472b6" fontSize="10" fontWeight="bold" fontFamily="monospace">IMG</text>
-              <text x="-40" y="4" textAnchor="end" fill="#ec4899" fontSize="12" fontWeight="bold" fontFamily="sans-serif">REMOVER</text>
-            </g>
-          </svg>
+              {/* Nodo 2: CotiPro SaaS - 72 deg */}
+              <div className="tech-flag-badge badge-cotipro" style={{ transform: 'rotate(72deg) translateY(-295px) rotate(-72deg)' }}>
+                <div className="flag-content cyan">
+                  <span className="flag-icon">⚡</span>
+                  <div className="flag-text">
+                    <strong>CotiPro SaaS</strong>
+                    <small>React • Supabase</small>
+                  </div>
+                </div>
+              </div>
+
+              {/* Nodo 3: Vortex 3D - 144 deg */}
+              <div className="tech-flag-badge badge-vortex" style={{ transform: 'rotate(144deg) translateY(-295px) rotate(-144deg)' }}>
+                <div className="flag-content purple">
+                  <span className="flag-icon">🎮</span>
+                  <div className="flag-text">
+                    <strong>Vortex 3D</strong>
+                    <small>GSAP • Canvas</small>
+                  </div>
+                </div>
+              </div>
+
+              {/* Nodo 4: AI Trailer - 216 deg */}
+              <div className="tech-flag-badge badge-trailer" style={{ transform: 'rotate(216deg) translateY(-295px) rotate(-216deg)' }}>
+                <div className="flag-content amber">
+                  <span className="flag-icon">🎬</span>
+                  <div className="flag-text">
+                    <strong>AI Trailer</strong>
+                    <small>Vite • React</small>
+                  </div>
+                </div>
+              </div>
+
+              {/* Nodo 5: Image Remover - 288 deg */}
+              <div className="tech-flag-badge badge-remover" style={{ transform: 'rotate(288deg) translateY(-295px) rotate(-288deg)' }}>
+                <div className="flag-content pink">
+                  <span className="flag-icon">✂️</span>
+                  <div className="flag-text">
+                    <strong>Bg Remover</strong>
+                    <small>Canvas API</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Encabezado superior */}
