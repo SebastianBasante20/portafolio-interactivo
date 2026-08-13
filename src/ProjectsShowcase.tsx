@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ExternalLink, ShoppingBag, Sparkles, Box, Film, Image, CheckCircle, Database, ChevronDown, ArrowRight, ArrowDown, X } from 'lucide-react';
+import { ExternalLink, ShoppingBag, Sparkles, Box, Film, Image, CheckCircle, Database, ChevronDown, ArrowRight, ArrowDown, X, Terminal, Cpu } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import './ProjectsShowcase.css';
@@ -17,6 +17,7 @@ export interface ProjectItem {
   previewType: 'pos' | 'cotipro' | 'vortex' | 'trailer' | 'remover';
   problem: string;
   architecture: string;
+  accentColor: string;
 }
 
 export const DEFAULT_PROJECTS: ProjectItem[] = [
@@ -34,6 +35,7 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     previewType: 'pos',
     problem: 'En municipios con baja conectividad, las caídas de internet paralizan la facturación en caja.',
     architecture: 'Aplicación Desktop Electron con SQLite embebido y Drizzle ORM. Persistencia 100% offline en disco local con sync opcional.',
+    accentColor: '#10b981',
   },
   {
     id: 'cotipro',
@@ -49,6 +51,7 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     previewType: 'cotipro',
     problem: 'Las empresas B2B tardan horas preparando cotizaciones en PDF y pierden seguimiento de ventas.',
     architecture: 'Arquitectura multi-empresa isolada con Supabase RLS, asistente IA seguro en backend serverless y firma digital con trazabilidad.',
+    accentColor: '#06b6d4',
   },
   {
     id: 'vortex-studio',
@@ -64,6 +67,7 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     previewType: 'vortex',
     problem: 'Renderizar videos pesados para personajes 3D ralentiza la carga web en teléfonos.',
     architecture: 'Generación vectorial interactiva con GSAP ScrollTrigger sobre Canvas 2D a 60 FPS estables sin descargar videos.',
+    accentColor: '#a855f7',
   },
   {
     id: 'ai-trailer',
@@ -79,6 +83,7 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     previewType: 'trailer',
     problem: 'Producir tráilers publicitarios requiere costosos softwares de edición y horas de render.',
     architecture: 'Pipeline serverless que combina APIs generativas de video/voz con una línea de tiempo modular en React.',
+    accentColor: '#f59e0b',
   },
   {
     id: 'bg-remover',
@@ -94,6 +99,7 @@ export const DEFAULT_PROJECTS: ProjectItem[] = [
     previewType: 'remover',
     problem: 'Depender de servidores externos para quitar fondos incrementa costos y tiempos de latencia.',
     architecture: 'Algoritmo de segmentación ejecutado directo en cliente con Canvas API y canal Alfa PNG sin enviar imágenes a terceros.',
+    accentColor: '#ec4899',
   },
 ];
 
@@ -115,6 +121,7 @@ export default function ProjectsShowcase({
   const sectionRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const orbitRef = useRef<HTMLDivElement>(null);
+  const coreGlowRef = useRef<SVGStopElement>(null);
   const [activeStep, setActiveStep] = useState(1);
   const [progressPercent, setProgressPercent] = useState(0);
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
@@ -144,22 +151,34 @@ export default function ProjectsShowcase({
           start: 'top top',
           end: () => `+=${track.scrollWidth}`,
           pin: true,
-          scrub: 1,
+          scrub: 0.8,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
             const p = Math.max(0, Math.min(1, self.progress));
             setProgressPercent(Math.round(p * 100));
-            const step = Math.min(
-              projects.length,
-              Math.floor(p * projects.length) + 1
+            const stepIndex = Math.min(
+              projects.length - 1,
+              Math.floor(p * projects.length)
             );
-            setActiveStep(step);
+            setActiveStep(stepIndex + 1);
 
+            // Transición dinámica de resplandor ambiental según el proyecto activo
+            const activeProject = projects[stepIndex];
+            if (activeProject && coreGlowRef.current) {
+              gsap.to(coreGlowRef.current, {
+                fill: activeProject.accentColor,
+                duration: 0.4,
+                ease: 'power1.out',
+              });
+            }
+
+            // Sincronización de rotación de órbita (nodo activo en el top 0 deg)
             const orbitRotation = -p * 288;
             if (orbit) {
               gsap.set(orbit, { rotate: orbitRotation });
             }
 
+            // Contrarrotar las insignias de los nodos para mantener texto e iconos verticales
             const cards = section.querySelectorAll('.landmark-card');
             cards.forEach((card, idx) => {
               const baseAngle = nodeAngles[idx] || 0;
@@ -174,11 +193,66 @@ export default function ProjectsShowcase({
     return () => ctx.revert();
   }, [projects]);
 
+  // Atajos de teclado (Flechas y Teclas 1-5) para navegación fluida sin romper el scroll
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const section = sectionRef.current;
+      const track = trackRef.current;
+      if (!section || !track) return;
+
+      const keyNumber = parseInt(e.key, 10);
+      if (!isNaN(keyNumber) && keyNumber >= 1 && keyNumber <= projects.length) {
+        const targetStep = keyNumber - 1;
+        const p = targetStep / (projects.length - 1);
+        const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+        const targetY = sectionTop + p * track.scrollWidth;
+        window.scrollTo({ top: targetY, behavior: 'smooth' });
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [projects]);
+
+  // Inclinación 3D magnética y reflejo especular en tarjetas
+  const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+
+    const rotateX = ((y - centerY) / centerY) * -5;
+    const rotateY = ((x - centerX) / centerX) * 5;
+
+    gsap.to(card, {
+      rotateX,
+      rotateY,
+      transformPerspective: 1000,
+      duration: 0.25,
+      ease: 'power1.out',
+    });
+
+    card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
+    card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
+  };
+
+  const handleCardMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    const card = e.currentTarget;
+    gsap.to(card, {
+      rotateX: 0,
+      rotateY: 0,
+      duration: 0.4,
+      ease: 'power2.out',
+    });
+  };
+
   const handleCardClick = (id: string) => {
     setExpandedCardId((prev) => (prev === id ? null : id));
   };
 
-  // Función para saltar la sección de proyectos e ir al contenido inferior
   const handleSkipSection = () => {
     const section = sectionRef.current;
     const track = trackRef.current;
@@ -204,7 +278,7 @@ export default function ProjectsShowcase({
               <span className="pos-terminal-id">Caja #01 • Nariño</span>
             </div>
             <div className="pos-items-list">
-              <div className="pos-item">
+              <div className="pos-item active-pulse">
                 <span>Paracetamol 500mg (x2)</span>
                 <strong>$12.500</strong>
               </div>
@@ -235,7 +309,7 @@ export default function ProjectsShowcase({
               <div className="table-row"><span>Licencia SaaS Pro</span><span>$49.900</span></div>
               <div className="table-row"><span>Módulo Asistente IA</span><span>$99.900</span></div>
             </div>
-            <div className="cotipro-ai-tag">
+            <div className="cotipro-ai-tag glowing-border">
               <Sparkles size={12} /> Coti AI: Cotización generada y enviada en 2 min
             </div>
           </div>
@@ -303,15 +377,14 @@ export default function ProjectsShowcase({
       )}
 
       <section ref={sectionRef} className="projects-showcase-section">
-        {/* ESTRUCTURA ORBITAL Y NODOS ILUSTRADOS VECTORIALES SVG */}
+        {/* ESTRUCTURA ORBITAL Y ANILLO VECTORIAL CON LUZ DINÁMICA */}
         <div className="giant-orbit-wrapper" aria-hidden="true">
           <div ref={orbitRef} className="system-core-container">
             <svg className="system-core-svg" viewBox="0 0 700 700" fill="none">
               <defs>
                 <radialGradient id="core-glow" cx="50%" cy="50%" r="50%">
-                  <stop offset="0%" stopColor="#10b981" stopOpacity="0.22" />
-                  <stop offset="40%" stopColor="#06b6d4" stopOpacity="0.12" />
-                  <stop offset="80%" stopColor="#a855f7" stopOpacity="0.05" />
+                  <stop ref={coreGlowRef} offset="0%" stopColor="#10b981" stopOpacity="0.28" />
+                  <stop offset="50%" stopColor="#06b6d4" stopOpacity="0.1" />
                   <stop offset="100%" stopColor="#09090b" stopOpacity="0" />
                 </radialGradient>
                 <linearGradient id="ring-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -336,7 +409,7 @@ export default function ProjectsShowcase({
               <line x1="30" y1="350" x2="670" y2="350" stroke="rgba(255, 255, 255, 0.05)" strokeWidth="1" strokeDasharray="4 4" />
             </svg>
 
-            {/* NODOS SOBRE LOS PUNTOS BRILLANTES */}
+            {/* NODOS CON INSIGNIAS SVG SOBRE PUNTOS BRILLANTES */}
             <div className="system-badges-ring">
               <div className="tech-landmark-node node-pos" style={{ transform: 'rotate(0deg) translateY(-290px)' }}>
                 <span className="glowing-orb-dot emerald" />
@@ -426,7 +499,7 @@ export default function ProjectsShowcase({
           <p className="projects-showcase-description">{description}</p>
         </div>
 
-        {/* Pista horizontal de tarjetas */}
+        {/* Pista horizontal de tarjetas con efecto 3D tilt y reflejo espectral */}
         <div className="projects-showcase-track-container">
           <div ref={trackRef} className="projects-showcase-track">
             {projects.map((project) => {
@@ -450,6 +523,8 @@ export default function ProjectsShowcase({
                 <div
                   key={project.id}
                   className={`projects-showcase-card card-large ${isExpanded ? 'is-expanded' : ''}`}
+                  onMouseMove={handleCardMouseMove}
+                  onMouseLeave={handleCardMouseLeave}
                   onClick={() => handleCardClick(project.id)}
                 >
                   {/* CONTENIDO SUPERIOR DE LA TARJETA */}
@@ -557,15 +632,18 @@ export default function ProjectsShowcase({
           <div className="progress-bar-container">
             <div
               className="progress-bar-fill"
-              style={{ width: `${progressPercent}%` }}
+              style={{
+                width: `${progressPercent}%`,
+                background: `linear-gradient(90deg, ${projects[activeStep - 1]?.accentColor || '#10b981'} 0%, #06b6d4 100%)`,
+              }}
             />
           </div>
           <div className="footer-label-row">
-            <span>PORTFOLIO SHOWCASE • NAVEGACIÓN HORIZONTAL</span>
+            <span>PORTFOLIO SHOWCASE • PRESONA 1-5 PARA IR AL PROYECTO</span>
             <button className="skip-showcase-btn" onClick={handleSkipSection}>
               Saltar proyectos <ArrowDown size={14} />
             </button>
-            <span className="step-counter">
+            <span className="step-counter" style={{ color: projects[activeStep - 1]?.accentColor || '#34d399' }}>
               0{activeStep} / 0{projects.length}
             </span>
           </div>
