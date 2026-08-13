@@ -119,66 +119,6 @@ export default function ProjectsShowcase({
   const [progressPercent, setProgressPercent] = useState(0);
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
 
-  const currentIndexRef = useRef(0);
-  const isAnimatingRef = useRef(false);
-  const isDraggingRef = useRef(false);
-  const startXRef = useRef(0);
-  const [isDraggingState, setIsDraggingState] = useState(false);
-
-  const nodeAngles = [0, 72, 144, 216, 288];
-
-  // Función de desplazamiento instantáneo a un índice específico sin retardo de inicio
-  const goToIndex = (targetIndex: number) => {
-    const newIndex = Math.max(0, Math.min(projects.length - 1, targetIndex));
-    currentIndexRef.current = newIndex;
-    setActiveStep(newIndex + 1);
-
-    const p = newIndex / (projects.length - 1);
-    setProgressPercent(Math.round(p * 100));
-
-    const track = trackRef.current;
-    const orbit = orbitRef.current;
-    const section = sectionRef.current;
-
-    if (!track || !section) return;
-
-    const trackWidth = track.scrollWidth;
-    const maxScroll = trackWidth - window.innerWidth + 60;
-    const targetX = -p * maxScroll;
-    const orbitRotation = -p * 288;
-
-    isAnimatingRef.current = true;
-
-    // Transición directa en 0.35s con respuesta inmediata
-    gsap.to(track, {
-      x: targetX,
-      duration: 0.35,
-      ease: 'power2.out',
-      onComplete: () => {
-        isAnimatingRef.current = false;
-      },
-    });
-
-    if (orbit) {
-      gsap.to(orbit, {
-        rotate: orbitRotation,
-        duration: 0.35,
-        ease: 'power2.out',
-      });
-    }
-
-    const cards = section.querySelectorAll('.landmark-card');
-    cards.forEach((card, idx) => {
-      const baseAngle = nodeAngles[idx] || 0;
-      const currentTotalAngle = orbitRotation + baseAngle;
-      gsap.to(card, {
-        rotate: -currentTotalAngle,
-        duration: 0.35,
-        ease: 'power2.out',
-      });
-    });
-  };
-
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
@@ -194,7 +134,9 @@ export default function ProjectsShowcase({
         return -(trackWidth - window.innerWidth + 60);
       };
 
-      // ScrollTrigger ultra-reactivo 1:1 sin snap interno diferido
+      const nodeAngles = [0, 72, 144, 216, 288];
+
+      // Desplazamiento horizontal GSAP original restaurado
       gsap.to(track, {
         x: getScrollAmount,
         ease: 'none',
@@ -203,24 +145,24 @@ export default function ProjectsShowcase({
           start: 'top top',
           end: () => `+=${track.scrollWidth}`,
           pin: true,
-          scrub: 0.1, // Respuesta de 0.1s instantánea en scroll continuo
+          scrub: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
             const p = Math.max(0, Math.min(1, self.progress));
             setProgressPercent(Math.round(p * 100));
-
-            const closestStep = Math.min(
-              projects.length - 1,
-              Math.round(p * (projects.length - 1))
+            const step = Math.min(
+              projects.length,
+              Math.floor(p * projects.length) + 1
             );
-            currentIndexRef.current = closestStep;
-            setActiveStep(closestStep + 1);
+            setActiveStep(step);
 
+            // Sincronización de órbita: el nodo de la tarjeta activa queda arriba (0 deg)
             const orbitRotation = -p * 288;
             if (orbit) {
               gsap.set(orbit, { rotate: orbitRotation });
             }
 
+            // Contrarrotar las tarjetas de nodos para mantener texto e iconos 100% verticales
             const cards = section.querySelectorAll('.landmark-card');
             cards.forEach((card, idx) => {
               const baseAngle = nodeAngles[idx] || 0;
@@ -235,54 +177,8 @@ export default function ProjectsShowcase({
     return () => ctx.revert();
   }, [projects]);
 
-  // Captura inmediata de rueda del mouse (0ms de retraso al girar la rueda)
-  const handleWheelNative = (e: React.WheelEvent) => {
-    const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
-    if (Math.abs(delta) < 8 || isAnimatingRef.current) return;
-
-    if (delta > 0) {
-      if (currentIndexRef.current < projects.length - 1) {
-        goToIndex(currentIndexRef.current + 1);
-      }
-    } else {
-      if (currentIndexRef.current > 0) {
-        goToIndex(currentIndexRef.current - 1);
-      }
-    }
-  };
-
   const handleCardClick = (id: string) => {
-    if (isDraggingRef.current) return;
     setExpandedCardId((prev) => (prev === id ? null : id));
-  };
-
-  // Arrastre directo por mouse sin retardo
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).closest('button, a')) return;
-    isDraggingRef.current = false;
-    startXRef.current = e.clientX;
-
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      const deltaX = startXRef.current - moveEvent.clientX;
-      if (Math.abs(deltaX) > 4) {
-        isDraggingRef.current = true;
-        setIsDraggingState(true);
-        window.scrollBy(0, deltaX * 2.2);
-        startXRef.current = moveEvent.clientX;
-      }
-    };
-
-    const handleMouseUp = () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-      setTimeout(() => {
-        isDraggingRef.current = false;
-        setIsDraggingState(false);
-      }, 30);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
   };
 
   const renderProjectPreview = (type: string) => {
@@ -386,7 +282,7 @@ export default function ProjectsShowcase({
   };
 
   return (
-    <div className={`projects-showcase-wrapper ${className}`} onWheel={handleWheelNative}>
+    <div className={`projects-showcase-wrapper ${className}`}>
       {showSpacer && (
         <div className="projects-showcase-spacer-top">
           <span>↓ Desplaza hacia abajo para ver la animación pinned ↓</span>
@@ -518,12 +414,9 @@ export default function ProjectsShowcase({
         </div>
 
         {/* Pista horizontal de tarjetas */}
-        <div
-          className={`projects-showcase-track-container ${isDraggingState ? 'is-dragging' : ''}`}
-          onMouseDown={handleMouseDown}
-        >
+        <div className="projects-showcase-track-container">
           <div ref={trackRef} className="projects-showcase-track">
-            {projects.map((project, idx) => {
+            {projects.map((project) => {
               const isExpanded = expandedCardId === project.id;
               const badgeClass =
                 project.badgeType === 'emerald'
@@ -544,10 +437,7 @@ export default function ProjectsShowcase({
                 <div
                   key={project.id}
                   className={`projects-showcase-card card-large ${isExpanded ? 'is-expanded' : ''}`}
-                  onClick={() => {
-                    goToIndex(idx);
-                    handleCardClick(project.id);
-                  }}
+                  onClick={() => handleCardClick(project.id)}
                 >
                   {/* CONTENIDO SUPERIOR DE LA TARJETA */}
                   <div className="card-top-content">
@@ -577,7 +467,6 @@ export default function ProjectsShowcase({
                           className={`ver-caso-trigger-btn ${isExpanded ? 'active' : ''}`}
                           onClick={(e) => {
                             e.stopPropagation();
-                            goToIndex(idx);
                             handleCardClick(project.id);
                           }}
                         >
@@ -659,7 +548,7 @@ export default function ProjectsShowcase({
             />
           </div>
           <div className="footer-label-row">
-            <span>PORTFOLIO SHOWCASE • NAVEGACIÓN INSTANTÁNEA 0ms</span>
+            <span>PORTFOLIO SHOWCASE • SCROLL HORIZONTAL</span>
             <span className="step-counter">
               0{activeStep} / 0{projects.length}
             </span>
