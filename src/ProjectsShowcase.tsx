@@ -121,6 +121,7 @@ export default function ProjectsShowcase({
   const sectionRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const orbitRef = useRef<HTMLDivElement>(null);
+  const orbitContainerRef = useRef<HTMLDivElement>(null);
   const coreGlowRef = useRef<SVGStopElement>(null);
   const [activeStep, setActiveStep] = useState(1);
   const [progressPercent, setProgressPercent] = useState(0);
@@ -175,7 +176,7 @@ export default function ProjectsShowcase({
             // Sincronización de rotación de órbita (nodo activo en el top 0 deg)
             const orbitRotation = -p * 288;
             if (orbit) {
-              gsap.set(orbit, { rotate: orbitRotation });
+              gsap.set(orbit, { rotateZ: orbitRotation });
             }
 
             // Contrarrotar las insignias de los nodos para mantener texto e iconos verticales
@@ -183,7 +184,7 @@ export default function ProjectsShowcase({
             cards.forEach((card, idx) => {
               const baseAngle = nodeAngles[idx] || 0;
               const currentTotalAngle = orbitRotation + baseAngle;
-              gsap.set(card, { rotate: -currentTotalAngle });
+              gsap.set(card, { rotateZ: -currentTotalAngle });
             });
           },
         },
@@ -193,7 +194,39 @@ export default function ProjectsShowcase({
     return () => ctx.revert();
   }, [projects]);
 
-  // Atajos de teclado (Flechas y Teclas 1-5) para navegación fluida sin romper el scroll
+  // Efecto Parallax 3D interactivo en el fondo espacial al mover el mouse
+  const handleSectionMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const section = sectionRef.current;
+    const orbitContainer = orbitContainerRef.current;
+    if (!section || !orbitContainer) return;
+
+    const { width, height, left, top } = section.getBoundingClientRect();
+    const mouseX = (e.clientX - left - width / 2) / (width / 2);
+    const mouseY = (e.clientY - top - height / 2) / (height / 2);
+
+    // Inclinar la estructura orbital del fondo en espacio 3D
+    gsap.to(orbitContainer, {
+      rotateY: mouseX * 18,
+      rotateX: -mouseY * 18,
+      translateZ: 30,
+      duration: 0.7,
+      ease: 'power2.out',
+    });
+  };
+
+  const handleSectionMouseLeave = () => {
+    if (orbitContainerRef.current) {
+      gsap.to(orbitContainerRef.current, {
+        rotateY: 0,
+        rotateX: 0,
+        translateZ: 0,
+        duration: 1.2,
+        ease: 'power2.out',
+      });
+    }
+  };
+
+  // Atajos de teclado (Flechas y Teclas 1-5) para navegación fluida
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const section = sectionRef.current;
@@ -224,8 +257,8 @@ export default function ProjectsShowcase({
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    const rotateX = ((y - centerY) / centerY) * -5;
-    const rotateY = ((x - centerX) / centerX) * 5;
+    const rotateX = ((y - centerY) / centerY) * -6;
+    const rotateY = ((x - centerX) / centerX) * 6;
 
     gsap.to(card, {
       rotateX,
@@ -376,116 +409,127 @@ export default function ProjectsShowcase({
         </div>
       )}
 
-      <section ref={sectionRef} className="projects-showcase-section">
-        {/* ESTRUCTURA ORBITAL Y ANILLO VECTORIAL CON LUZ DINÁMICA */}
+      <section
+        ref={sectionRef}
+        className="projects-showcase-section"
+        onMouseMove={handleSectionMouseMove}
+        onMouseLeave={handleSectionMouseLeave}
+      >
+        {/* FONDO ORBITAL CON ESPACIO DE PERSPECTIVA 3D */}
         <div className="giant-orbit-wrapper" aria-hidden="true">
-          <div ref={orbitRef} className="system-core-container">
-            <svg className="system-core-svg" viewBox="0 0 700 700" fill="none">
-              <defs>
-                <radialGradient id="core-glow" cx="50%" cy="50%" r="50%">
-                  <stop ref={coreGlowRef} offset="0%" stopColor="#10b981" stopOpacity="0.28" />
-                  <stop offset="50%" stopColor="#06b6d4" stopOpacity="0.1" />
-                  <stop offset="100%" stopColor="#09090b" stopOpacity="0" />
-                </radialGradient>
-                <linearGradient id="ring-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#10b981" />
-                  <stop offset="40%" stopColor="#06b6d4" />
-                  <stop offset="80%" stopColor="#a855f7" />
-                  <stop offset="100%" stopColor="#f59e0b" />
-                </linearGradient>
-                <filter id="orb-glow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feGaussianBlur stdDeviation="6" result="blur" />
-                  <feComposite in="SourceGraphic" in2="blur" operator="over" />
-                </filter>
-              </defs>
+          <div ref={orbitContainerRef} className="orbit-3d-perspective-container">
+            {/* ANILLOS 3D EN PLANO DE PROFUNDIDAD Z */}
+            <div className="bg-3d-tilted-ring ring-back" />
+            <div className="bg-3d-tilted-ring ring-mid" />
 
-              <circle cx="350" cy="350" r="320" fill="url(#core-glow)" />
-              <circle cx="350" cy="350" r="290" stroke="url(#ring-grad-1)" strokeWidth="3" filter="url(#orb-glow)" opacity="0.9" />
-              <circle cx="350" cy="350" r="290" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" strokeDasharray="6 8" />
-              <circle cx="350" cy="350" r="210" stroke="#06b6d4" strokeWidth="1.5" strokeDasharray="100 20 50 20" opacity="0.5" />
-              <circle cx="350" cy="350" r="140" stroke="#a855f7" strokeWidth="1.5" strokeDasharray="60 15" opacity="0.4" />
+            <div ref={orbitRef} className="system-core-container">
+              <svg className="system-core-svg" viewBox="0 0 700 700" fill="none">
+                <defs>
+                  <radialGradient id="core-glow" cx="50%" cy="50%" r="50%">
+                    <stop ref={coreGlowRef} offset="0%" stopColor="#10b981" stopOpacity="0.28" />
+                    <stop offset="50%" stopColor="#06b6d4" stopOpacity="0.1" />
+                    <stop offset="100%" stopColor="#09090b" stopOpacity="0" />
+                  </radialGradient>
+                  <linearGradient id="ring-grad-1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#10b981" />
+                    <stop offset="40%" stopColor="#06b6d4" />
+                    <stop offset="80%" stopColor="#a855f7" />
+                    <stop offset="100%" stopColor="#f59e0b" />
+                  </linearGradient>
+                  <filter id="orb-glow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feGaussianBlur stdDeviation="6" result="blur" />
+                    <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                  </filter>
+                </defs>
 
-              <line x1="350" y1="30" x2="350" y2="670" stroke="rgba(255, 255, 255, 0.05)" strokeWidth="1" strokeDasharray="4 4" />
-              <line x1="30" y1="350" x2="670" y2="350" stroke="rgba(255, 255, 255, 0.05)" strokeWidth="1" strokeDasharray="4 4" />
-            </svg>
+                <circle cx="350" cy="350" r="320" fill="url(#core-glow)" />
+                <circle cx="350" cy="350" r="290" stroke="url(#ring-grad-1)" strokeWidth="3" filter="url(#orb-glow)" opacity="0.9" />
+                <circle cx="350" cy="350" r="290" stroke="rgba(255, 255, 255, 0.15)" strokeWidth="1" strokeDasharray="6 8" />
+                <circle cx="350" cy="350" r="210" stroke="#06b6d4" strokeWidth="1.5" strokeDasharray="100 20 50 20" opacity="0.5" />
+                <circle cx="350" cy="350" r="140" stroke="#a855f7" strokeWidth="1.5" strokeDasharray="60 15" opacity="0.4" />
 
-            {/* NODOS CON INSIGNIAS SVG SOBRE PUNTOS BRILLANTES */}
-            <div className="system-badges-ring">
-              <div className="tech-landmark-node node-pos" style={{ transform: 'rotate(0deg) translateY(-290px)' }}>
-                <span className="glowing-orb-dot emerald" />
-                <div className="node-stalk emerald" />
-                <div className="landmark-card emerald">
-                  <svg className="landmark-svg" viewBox="0 0 32 32" fill="none">
-                    <rect x="4" y="6" width="24" height="16" rx="3" stroke="#10b981" strokeWidth="2" fill="rgba(16, 185, 129, 0.18)" />
-                    <path d="M 12 11 H 20 M 16 7 V 15" stroke="#34d399" strokeWidth="2" strokeLinecap="round" />
-                    <path d="M 8 26 H 24 M 16 22 V 26" stroke="#10b981" strokeWidth="2" />
-                  </svg>
-                  <div className="landmark-text">
-                    <strong>POS Farma</strong>
-                    <small>POS Terminal & SQLite</small>
+                <line x1="350" y1="30" x2="350" y2="670" stroke="rgba(255, 255, 255, 0.05)" strokeWidth="1" strokeDasharray="4 4" />
+                <line x1="30" y1="350" x2="670" y2="350" stroke="rgba(255, 255, 255, 0.05)" strokeWidth="1" strokeDasharray="4 4" />
+              </svg>
+
+              {/* NODOS CON INSIGNIAS SVG SOBRE PUNTOS BRILLANTES */}
+              <div className="system-badges-ring">
+                <div className="tech-landmark-node node-pos" style={{ transform: 'rotate(0deg) translateY(-290px)' }}>
+                  <span className="glowing-orb-dot emerald" />
+                  <div className="node-stalk emerald" />
+                  <div className="landmark-card emerald">
+                    <svg className="landmark-svg" viewBox="0 0 32 32" fill="none">
+                      <rect x="4" y="6" width="24" height="16" rx="3" stroke="#10b981" strokeWidth="2" fill="rgba(16, 185, 129, 0.18)" />
+                      <path d="M 12 11 H 20 M 16 7 V 15" stroke="#34d399" strokeWidth="2" strokeLinecap="round" />
+                      <path d="M 8 26 H 24 M 16 22 V 26" stroke="#10b981" strokeWidth="2" />
+                    </svg>
+                    <div className="landmark-text">
+                      <strong>POS Farma</strong>
+                      <small>POS Terminal & SQLite</small>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="tech-landmark-node node-cotipro" style={{ transform: 'rotate(72deg) translateY(-290px)' }}>
-                <span className="glowing-orb-dot cyan" />
-                <div className="node-stalk cyan" />
-                <div className="landmark-card cyan">
-                  <svg className="landmark-svg" viewBox="0 0 32 32" fill="none">
-                    <path d="M 8 4 H 20 L 26 10 V 26 C 26 27.1 25.1 28 24 28 H 8 C 6.9 28 6 27.1 6 26 V 6 C 6 4.9 6.9 4 8 4 Z" stroke="#06b6d4" strokeWidth="2" fill="rgba(6, 182, 212, 0.18)" />
-                    <path d="M 12 16 L 15 19 L 21 13" stroke="#22d3ee" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                    <circle cx="23" cy="7" r="2" fill="#38bdf8" />
-                  </svg>
-                  <div className="landmark-text">
-                    <strong>CotiPro SaaS</strong>
-                    <small>Firma Digital & IA</small>
+                <div className="tech-landmark-node node-cotipro" style={{ transform: 'rotate(72deg) translateY(-290px)' }}>
+                  <span className="glowing-orb-dot cyan" />
+                  <div className="node-stalk cyan" />
+                  <div className="landmark-card cyan">
+                    <svg className="landmark-svg" viewBox="0 0 32 32" fill="none">
+                      <path d="M 8 4 H 20 L 26 10 V 26 C 26 27.1 25.1 28 24 28 H 8 C 6.9 28 6 27.1 6 26 V 6 C 6 4.9 6.9 4 8 4 Z" stroke="#06b6d4" strokeWidth="2" fill="rgba(6, 182, 212, 0.18)" />
+                      <path d="M 12 16 L 15 19 L 21 13" stroke="#22d3ee" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="23" cy="7" r="2" fill="#38bdf8" />
+                    </svg>
+                    <div className="landmark-text">
+                      <strong>CotiPro SaaS</strong>
+                      <small>Firma Digital & IA</small>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="tech-landmark-node node-vortex" style={{ transform: 'rotate(144deg) translateY(-290px)' }}>
-                <span className="glowing-orb-dot purple" />
-                <div className="node-stalk purple" />
-                <div className="landmark-card purple">
-                  <svg className="landmark-svg" viewBox="0 0 32 32" fill="none">
-                    <path d="M 16 3 L 28 9 V 23 L 16 29 L 4 23 V 9 Z" stroke="#a855f7" strokeWidth="2" fill="rgba(168, 85, 247, 0.18)" />
-                    <path d="M 16 3 V 29 M 4 9 L 28 23 M 28 9 L 4 23" stroke="#c084fc" strokeWidth="1.2" />
-                  </svg>
-                  <div className="landmark-text">
-                    <strong>Vortex 3D</strong>
-                    <small>Motor GSAP & Canvas</small>
+                <div className="tech-landmark-node node-vortex" style={{ transform: 'rotate(144deg) translateY(-290px)' }}>
+                  <span className="glowing-orb-dot purple" />
+                  <div className="node-stalk purple" />
+                  <div className="landmark-card purple">
+                    <svg className="landmark-svg" viewBox="0 0 32 32" fill="none">
+                      <path d="M 16 3 L 28 9 V 23 L 16 29 L 4 23 V 9 Z" stroke="#a855f7" strokeWidth="2" fill="rgba(168, 85, 247, 0.18)" />
+                      <path d="M 16 3 V 29 M 4 9 L 28 23 M 28 9 L 4 23" stroke="#c084fc" strokeWidth="1.2" />
+                    </svg>
+                    <div className="landmark-text">
+                      <strong>Vortex 3D</strong>
+                      <small>Motor GSAP & Canvas</small>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="tech-landmark-node node-trailer" style={{ transform: 'rotate(216deg) translateY(-290px)' }}>
-                <span className="glowing-orb-dot amber" />
-                <div className="node-stalk amber" />
-                <div className="landmark-card amber">
-                  <svg className="landmark-svg" viewBox="0 0 32 32" fill="none">
-                    <rect x="4" y="8" width="24" height="18" rx="3" stroke="#f59e0b" strokeWidth="2" fill="rgba(245, 158, 11, 0.18)" />
-                    <path d="M 13 13 L 21 17 L 13 21 Z" fill="#fbbf24" />
-                    <path d="M 4 12 H 28" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="3 3" />
-                  </svg>
-                  <div className="landmark-text">
-                    <strong>AI Trailer</strong>
-                    <small>Generador de Video</small>
+                <div className="tech-landmark-node node-trailer" style={{ transform: 'rotate(216deg) translateY(-290px)' }}>
+                  <span className="glowing-orb-dot amber" />
+                  <div className="node-stalk amber" />
+                  <div className="landmark-card amber">
+                    <svg className="landmark-svg" viewBox="0 0 32 32" fill="none">
+                      <rect x="4" y="8" width="24" height="18" rx="3" stroke="#f59e0b" strokeWidth="2" fill="rgba(245, 158, 11, 0.18)" />
+                      <path d="M 13 13 L 21 17 L 13 21 Z" fill="#fbbf24" />
+                      <path d="M 4 12 H 28" stroke="#f59e0b" strokeWidth="1.5" strokeDasharray="3 3" />
+                    </svg>
+                    <div className="landmark-text">
+                      <strong>AI Trailer</strong>
+                      <small>Generador de Video</small>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="tech-landmark-node node-remover" style={{ transform: 'rotate(288deg) translateY(-290px)' }}>
-                <span className="glowing-orb-dot pink" />
-                <div className="node-stalk pink" />
-                <div className="landmark-card pink">
-                  <svg className="landmark-svg" viewBox="0 0 32 32" fill="none">
-                    <rect x="5" y="5" width="22" height="22" rx="4" stroke="#ec4899" strokeWidth="2" fill="rgba(236, 72, 153, 0.18)" />
-                    <circle cx="12" cy="12" r="3" fill="#f472b6" />
-                    <path d="M 7 24 L 14 17 L 19 21 L 22 18 L 27 24" stroke="#ec4899" strokeWidth="2" strokeLinecap="round" />
-                  </svg>
-                  <div className="landmark-text">
-                    <strong>Bg Remover</strong>
-                    <small>Canvas Alpha API</small>
+                <div className="tech-landmark-node node-remover" style={{ transform: 'rotate(288deg) translateY(-290px)' }}>
+                  <span className="glowing-orb-dot pink" />
+                  <div className="node-stalk pink" />
+                  <div className="landmark-card pink">
+                    <svg className="landmark-svg" viewBox="0 0 32 32" fill="none">
+                      <rect x="5" y="5" width="22" height="22" rx="4" stroke="#ec4899" strokeWidth="2" fill="rgba(236, 72, 153, 0.18)" />
+                      <circle cx="12" cy="12" r="3" fill="#f472b6" />
+                      <path d="M 7 24 L 14 17 L 19 21 L 22 18 L 27 24" stroke="#ec4899" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                    <div className="landmark-text">
+                      <strong>Bg Remover</strong>
+                      <small>Canvas Alpha API</small>
+                    </div>
                   </div>
                 </div>
               </div>
