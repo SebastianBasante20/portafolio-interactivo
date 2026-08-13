@@ -119,6 +119,11 @@ export default function ProjectsShowcase({
   const [progressPercent, setProgressPercent] = useState(0);
   const [expandedCardId, setExpandedCardId] = useState<string | null>(null);
 
+  // Estado para arrastre con el mouse / drag-to-slide
+  const isDraggingRef = useRef(false);
+  const startXRef = useRef(0);
+  const [isDraggingState, setIsDraggingState] = useState(false);
+
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
@@ -134,18 +139,25 @@ export default function ProjectsShowcase({
         return -(trackWidth - window.innerWidth + 60);
       };
 
+      const snapIncrement = 1 / (projects.length - 1);
       const nodeAngles = [0, 72, 144, 216, 288];
 
-      // Desplazamiento horizontal pinned con rotación de órbita y contrarrotación vertical
+      // Desplazamiento horizontal con Snap suave por tarjeta + animación fluida
       gsap.to(track, {
         x: getScrollAmount,
-        ease: 'none',
+        ease: 'power1.out',
         scrollTrigger: {
           trigger: section,
           start: 'top top',
           end: () => `+=${track.scrollWidth}`,
           pin: true,
-          scrub: 1,
+          scrub: 0.8, // Transición suave sin frenadas bruscas
+          snap: {
+            snapTo: snapIncrement,
+            duration: { min: 0.35, max: 0.65 },
+            ease: 'power2.inOut',
+            delay: 0.05,
+          },
           invalidateOnRefresh: true,
           onUpdate: (self) => {
             const p = Math.max(0, Math.min(1, self.progress));
@@ -156,13 +168,13 @@ export default function ProjectsShowcase({
             );
             setActiveStep(step);
 
-            // Sincronización de órbita: el nodo de la tarjeta activa queda arriba (0 deg)
+            // Rotación fluida del anillo de órbita
             const orbitRotation = -p * 288;
             if (orbit) {
               gsap.set(orbit, { rotate: orbitRotation });
             }
 
-            // Contrarrotar las tarjetas de nodos para mantener texto e iconos 100% verticales
+            // Contrarrotar las insignias para mantener texto e iconos 100% verticales
             const cards = section.querySelectorAll('.landmark-card');
             cards.forEach((card, idx) => {
               const baseAngle = nodeAngles[idx] || 0;
@@ -178,7 +190,38 @@ export default function ProjectsShowcase({
   }, [projects]);
 
   const handleCardClick = (id: string) => {
+    // Si el usuario estaba arrastrando con el mouse, ignorar el click de expansión
+    if (isDraggingRef.current) return;
     setExpandedCardId((prev) => (prev === id ? null : id));
+  };
+
+  // Manejadores de arrastre con el mouse / touch drag
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('button, a')) return;
+    isDraggingRef.current = false;
+    startXRef.current = e.clientX;
+
+    const handleMouseMove = (moveEvent: MouseEvent) => {
+      const deltaX = startXRef.current - moveEvent.clientX;
+      if (Math.abs(deltaX) > 5) {
+        isDraggingRef.current = true;
+        setIsDraggingState(true);
+        window.scrollBy({ top: deltaX * 1.6, behavior: 'instant' as ScrollBehavior });
+        startXRef.current = moveEvent.clientX;
+      }
+    };
+
+    const handleMouseUp = () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+      setTimeout(() => {
+        isDraggingRef.current = false;
+        setIsDraggingState(false);
+      }, 50);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
   };
 
   const renderProjectPreview = (type: string) => {
@@ -413,8 +456,11 @@ export default function ProjectsShowcase({
           <p className="projects-showcase-description">{description}</p>
         </div>
 
-        {/* Pista horizontal de tarjetas */}
-        <div className="projects-showcase-track-container">
+        {/* Pista horizontal de tarjetas con soporte de arrastre por mouse/drag */}
+        <div
+          className={`projects-showcase-track-container ${isDraggingState ? 'is-dragging' : ''}`}
+          onMouseDown={handleMouseDown}
+        >
           <div ref={trackRef} className="projects-showcase-track">
             {projects.map((project) => {
               const isExpanded = expandedCardId === project.id;
@@ -501,7 +547,7 @@ export default function ProjectsShowcase({
                     </div>
                   </div>
 
-                  {/* CUADRO ATRÁS QUE SE DESPLAZA AL DAR CLICK EN LA TARJETA (ESTILO TRAVEL SLIDER) */}
+                  {/* CUADRO ATRÁS QUE SE DESPLAZA AL DAR CLICK EN LA TARJETA */}
                   <div className="card-sliding-panel" onClick={(e) => e.stopPropagation()}>
                     <div className="panel-inner-container">
                       <div className="panel-header-row">
@@ -548,7 +594,7 @@ export default function ProjectsShowcase({
             />
           </div>
           <div className="footer-label-row">
-            <span>PORTFOLIO SHOWCASE • SCROLL HORIZONTAL</span>
+            <span>PORTFOLIO SHOWCASE • ARRASTRA O SCROLL PARA NAVEGAR</span>
             <span className="step-counter">
               0{activeStep} / 0{projects.length}
             </span>

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   PROJECTS SHOWCASE - NEON ORBIT & SLIDING CARD DETAIL PANEL (VER CASO)
+   PROJECTS SHOWCASE - SMOOTH SNAP & DRAG-TO-SLIDE HORIZONTAL SLIDER
    ========================================================================== */
 
 .projects-showcase-wrapper {
@@ -238,7 +238,7 @@
   }
 }
 
-/* Track Container */
+/* Track Container con Cursor Grab / Grabbing */
 .projects-showcase-track-container {
   position: relative;
   width: 100%;
@@ -247,6 +247,12 @@
   margin-top: auto;
   margin-bottom: auto;
   z-index: 10;
+  cursor: grab;
+  user-select: none;
+}
+
+.projects-showcase-track-container.is-dragging {
+  cursor: grabbing;
 }
 
 .projects-showcase-track {
@@ -435,7 +441,7 @@
   transform: rotate(180deg);
 }
 
-/* CUADRO ATRÁS QUE SE DESPLAZA (PANEL DESLIZANTE DE DETALLES - ESTILO TRAVEL SLIDER) */
+/* CUADRO ATRÁS QUE SE DESPLAZA (PANEL DESLIZANTE DE DETALLES) */
 .card-sliding-panel {
   position: absolute;
   top: 85%;
